@@ -68,19 +68,19 @@ function drawKeyboard() {
 	for (var i = 0; i < keyboard[2].length; i++) {
 		drawKey(70 + 70 * i + (10), 150, keyboard[2][i], keydown[2][i]);
 	}
-
-	requestAnimationFrame(drawKeyboard);
 }
 
 function keyUpHandler(e) {
 	if (e.key === "Shift") {
 		shiftDown = false;
+		requestAnimationFrame(drawKeyboard);
 	} else {
 		var key = e.key.toLowerCase();
 		for (var i = 0; i < keyboard.length; i++) {
 			for (var j = 0; j < keyboard[i].length; j++) {
 				if (keyboard[i][j] === key) {
 					keydown[i][j] = false;
+					requestAnimationFrame(drawKeyboard);
 					return;
 				}
 			}
@@ -91,12 +91,14 @@ function keyUpHandler(e) {
 function keyDownHandler(e) {
 	if (e.key === "Shift") {
 		shiftDown = true;
+		requestAnimationFrame(drawKeyboard);
 	} else {
 		var key = e.key.toLowerCase();
 		for (var i = 0; i < keyboard.length; i++) {
 			for (var j = 0; j < keyboard[i].length; j++) {
 				if (keyboard[i][j] === key) {
 					keydown[i][j] = true;
+					requestAnimationFrame(drawKeyboard);
 					return;
 				}
 			}
