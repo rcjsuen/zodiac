@@ -24,13 +24,13 @@ function drawCharacter(x, y, height, width, letter, keydown) {
 var keydown = [
 	[ false, false, false, false, false, false, false, false, false, false ],
 	[ false, false, false, false, false, false, false, false, false ],
-	[ false, false, false, false, false, false, false ]
+	[ false, false, false, false, false, false, false, false, false ]
 ];
 
 var keyboard = [
 	[ 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p' ],
 	[ 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l' ],
-	[ 'z', 'x', 'c', 'v', 'b', 'n', 'm' ]
+	[ 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.' ]
 ];
 
 function drawKeyboard() {
