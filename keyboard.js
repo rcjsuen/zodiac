@@ -1,12 +1,21 @@
 /*eslint-env browser */
+/**
+ * The width and height of the key.
+ */
 const KEY_DIMENSIONS = 60;
-const KEY_EXPANSION_SIZE = 3;
+/**
+ * How much the key should grow in size if it is pressed.
+ */
+const KEY_EXPANSION_SIZE = 6;
 
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
 
+/**
+ * Whether the shift key is currently being pressed by the user.
+ */
 var shiftDown = false;
-var keydown = [
+var keyDown = [
 	[ false, false, false, false, false, false, false, false, false, false ],
 	[ false, false, false, false, false, false, false, false, false ],
 	[ false, false, false, false, false, false, false, false, false ]
@@ -17,12 +26,19 @@ var keyboard = [
 	[ 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.' ]
 ];
 
-function drawKeyOutline(x, y, keydown) {
+/**
+ * Draws the outline of a key.
+ * 
+ * @param x the desired starting X position of the key
+ * @param y the desired starting Y position of the key
+ * @param keydown whether this key is currently being pressed by the user
+ */
+function drawKeyOutline(x, y, keyDown) {
 	var dimensions = KEY_DIMENSIONS;
-	if (keydown) {
-		x = x - KEY_EXPANSION_SIZE;	
-		y = y - KEY_EXPANSION_SIZE;
-		dimensions = KEY_DIMENSIONS + (KEY_EXPANSION_SIZE * 2);
+	if (keyDown) {
+		x = x - (KEY_EXPANSION_SIZE / 2);	
+		y = y - (KEY_EXPANSION_SIZE / 2);
+		dimensions = KEY_DIMENSIONS + KEY_EXPANSION_SIZE;
 	}
 	
 	ctx.beginPath();
@@ -31,9 +47,9 @@ function drawKeyOutline(x, y, keydown) {
 	ctx.closePath();
 }
 
-function drawKey(x, y, letter, keydown) {
-	drawKeyOutline(x, y, keydown);
-	drawCharacter(x, y, KEY_DIMENSIONS, KEY_DIMENSIONS, letter, keydown);
+function drawKey(x, y, letter, keyDown) {
+	drawKeyOutline(x, y, keyDown);
+	drawCharacter(x, y, KEY_DIMENSIONS, KEY_DIMENSIONS, letter, keyDown);
 }
 
 function drawCharacter(x, y, height, width, letter, keydown) {
@@ -66,17 +82,17 @@ function drawKeyboard() {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 	for (var i = 0; i < keyboard[0].length; i++) {
-		drawKey(70 * i + (10), 10, keyboard[0][i], keydown[0][i]);
+		drawKey(70 * i + (10), 10, keyboard[0][i], keyDown[0][i]);
 	}
 
 	for (var i = 0; i < keyboard[1].length; i++) {
-		drawKey(35 + 70 * i + (10), 80, keyboard[1][i], keydown[1][i]);
+		drawKey(35 + 70 * i + (10), 80, keyboard[1][i], keyDown[1][i]);
 	}
 	
 	drawShiftKey(10, 150);
 
 	for (var i = 0; i < keyboard[2].length; i++) {
-		drawKey(70 + 70 * i + (10), 150, keyboard[2][i], keydown[2][i]);
+		drawKey(70 + 70 * i + (10), 150, keyboard[2][i], keyDown[2][i]);
 	}
 }
 
@@ -89,7 +105,7 @@ function keyUpHandler(e) {
 		for (var i = 0; i < keyboard.length; i++) {
 			for (var j = 0; j < keyboard[i].length; j++) {
 				if (keyboard[i][j] === key) {
-					keydown[i][j] = false;
+					keyDown[i][j] = false;
 					requestAnimationFrame(drawKeyboard);
 					return;
 				}
@@ -107,7 +123,7 @@ function keyDownHandler(e) {
 		for (var i = 0; i < keyboard.length; i++) {
 			for (var j = 0; j < keyboard[i].length; j++) {
 				if (keyboard[i][j] === key) {
-					keydown[i][j] = true;
+					keyDown[i][j] = true;
 					requestAnimationFrame(drawKeyboard);
 					return;
 				}
