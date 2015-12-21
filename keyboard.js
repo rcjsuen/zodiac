@@ -78,19 +78,25 @@ function drawShiftKey(x, y) {
 	ctx.closePath();
 }
 
+/**
+ * Draws the keyboard.
+ */
 function drawKeyboard() {
+	// clear the canvas before redrawing
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+	// draw the top row of the keyboard
 	for (var i = 0; i < keyboard[0].length; i++) {
 		drawKey(70 * i + (10), 10, keyboard[0][i], keyDown[0][i]);
 	}
 
+	// draw the home row of the keyboard
 	for (var i = 0; i < keyboard[1].length; i++) {
 		drawKey(35 + 70 * i + (10), 80, keyboard[1][i], keyDown[1][i]);
 	}
 	
+	// draw the bottom row of the keyboard
 	drawShiftKey(10, 150);
-
 	for (var i = 0; i < keyboard[2].length; i++) {
 		drawKey(70 + 70 * i + (10), 150, keyboard[2][i], keyDown[2][i]);
 	}
@@ -134,4 +140,5 @@ function keyDownHandler(e) {
 
 document.addEventListener("keyup", keyUpHandler, false);
 document.addEventListener("keydown", keyDownHandler, false);
+
 drawKeyboard();
