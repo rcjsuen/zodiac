@@ -34,6 +34,7 @@ function handleFileSelect(e) {
 		if (fileCounter !== files.length) {
 			reader.readAsText(files[fileCounter], "UTF-8");
 		} else {
+			document.getElementById("nextBtn").disabled = false;
 			show();
 		}
 	};
