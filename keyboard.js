@@ -141,4 +141,19 @@ function keyDownHandler(e) {
 document.addEventListener("keyup", keyUpHandler, false);
 document.addEventListener("keydown", keyDownHandler, false);
 
+// detect when the tab has become visible or hidden
+document.addEventListener("visibilitychange", function(e) {
+	for (var i = 0; i < keyboard.length; i++) {
+		for (var j = 0; j < keyboard[i].length; j++) {
+			keyDown[i][j] = false;
+		}
+	}
+	shiftDown = false;
+	// redraw the keyboard immediately, if we use delay it by using
+	// requestAnimationFrame(*), it will only redraw when the tab gains
+	// focus again, and that causes a flickering effect as the user will
+	// see the red keys for a brief moment
+	drawKeyboard();
+});
+
 drawKeyboard();
