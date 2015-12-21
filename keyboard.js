@@ -1,4 +1,7 @@
 /*eslint-env browser */
+const KEY_DIMENSIONS = 60;
+const KEY_EXPANSION_SIZE = 3;
+
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
 
@@ -14,16 +17,23 @@ var keyboard = [
 	[ 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.' ]
 ];
 
-function drawKeyOutline(x, y) {
+function drawKeyOutline(x, y, keydown) {
+	var dimensions = KEY_DIMENSIONS;
+	if (keydown) {
+		x = x - KEY_EXPANSION_SIZE;	
+		y = y - KEY_EXPANSION_SIZE;
+		dimensions = KEY_DIMENSIONS + (KEY_EXPANSION_SIZE * 2);
+	}
+	
 	ctx.beginPath();
 	ctx.strokeStyle = "black";
-	ctx.strokeRect(x, y, 60, 60);
+	ctx.strokeRect(x, y, dimensions, dimensions);
 	ctx.closePath();
 }
 
 function drawKey(x, y, letter, keydown) {
-	drawKeyOutline(x, y);
-	drawCharacter(x, y, 60, 60, letter, keydown);
+	drawKeyOutline(x, y, keydown);
+	drawCharacter(x, y, KEY_DIMENSIONS, KEY_DIMENSIONS, letter, keydown);
 }
 
 function drawCharacter(x, y, height, width, letter, keydown) {
