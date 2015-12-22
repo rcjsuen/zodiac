@@ -44,17 +44,14 @@ function handleFileSelect(e) {
 
 
 var enableKeyboard = true;
-var canvasKeyboardHeight = document.getElementById("canvas").getAttribute("height");
 
 function showKeyboard() {
 	enableKeyboard = !enableKeyboard;
 
 	if (enableKeyboard) {
-		document.getElementById("canvas").setAttribute("height", canvasKeyboardHeight);
-		document.getElementById("canvas").style.visibility = "visible";
+		document.getElementById("canvas").style.display = "inline";
 	} else {
-		document.getElementById("canvas").style.visibility = "hidden";
-		document.getElementById("canvas").setAttribute("height", 0);
+		document.getElementById("canvas").style.display = "none";
 	}
 }
 
