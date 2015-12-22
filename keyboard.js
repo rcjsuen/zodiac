@@ -130,7 +130,7 @@ function keyUpHandler(e) {
 		var key = e.key.toLowerCase();
 		// e.key is undefined in Safari 9.0.2
 		if (key === "undefined") {
-			key = String.fromCharCode(e.charCode).toLowerCase();
+			key = String.fromCharCode(e.keyCode).toLowerCase();
 		}
 		
 		for (var i = 0; i < keyboard.length; i++) {
@@ -156,7 +156,7 @@ function keyDownHandler(e) {
 		var key = e.key.toLowerCase();
 		// e.key is undefined in Safari 9.0.2
 		if (key === "undefined") {
-			key = String.fromCharCode(e.charCode).toLowerCase();
+			key = String.fromCharCode(e.keyCode).toLowerCase();
 		}
 		
 		for (var i = 0; i < keyboard.length; i++) {
