@@ -121,7 +121,7 @@ function keyUpHandler(e) {
 	if (e.key === "Shift") {
 		shiftDown = false;
 		requestAnimationFrame(drawKeyboard);
-	} else if (e.key === " ") {
+	} else if (e.key === " " || e.key === "Spacebar") {
 		spaceDown = false;
 		requestAnimationFrame(drawKeyboard);
 	} else {
@@ -142,7 +142,7 @@ function keyDownHandler(e) {
 	if (e.key === "Shift") {
 		shiftDown = true;
 		requestAnimationFrame(drawKeyboard);
-	} else if (e.key === " ") {
+	} else if (e.key === " " || e.key === "Spacebar") {
 		spaceDown = true;
 		requestAnimationFrame(drawKeyboard);
 	} else {
