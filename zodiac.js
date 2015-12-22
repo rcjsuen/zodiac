@@ -42,6 +42,22 @@ function handleFileSelect(e) {
 	reader.readAsText(files[fileCounter], "UTF-8");
 }
 
+
+var enableKeyboard = true;
+var canvasKeyboardHeight = document.getElementById("canvas").getAttribute("height");
+
+function showKeyboard() {
+	enableKeyboard = !enableKeyboard;
+
+	if (enableKeyboard) {
+		document.getElementById("canvas").setAttribute("height", canvasKeyboardHeight);
+		document.getElementById("canvas").style.visibility = "visible";
+	} else {
+		document.getElementById("canvas").style.visibility = "hidden";
+		document.getElementById("canvas").setAttribute("height", 0);
+	}
+}
+
 document.getElementById('files').addEventListener('change', handleFileSelect, false);
 
 function show() {
