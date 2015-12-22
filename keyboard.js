@@ -15,6 +15,7 @@ var ctx = canvas.getContext("2d");
  * Whether the shift key is currently being pressed by the user.
  */
 var shiftDown = false;
+var spaceDown = false;
 var keyDown = [
 	[ false, false, false, false, false, false, false, false, false, false ],
 	[ false, false, false, false, false, false, false, false, false ],
@@ -81,6 +82,18 @@ function drawShiftKey(x, y) {
 /**
  * Draws the keyboard.
  */
+
+function drawSpacebar() {
+	ctx.beginPath();
+	ctx.strokeStyle = "black";
+	if (spaceDown) {
+		ctx.strokeRect(112, 217, 486, 66);
+	} else {
+		ctx.strokeRect(115, 220, 480, 60);
+	}
+	ctx.closePath();
+}
+
 function drawKeyboard() {
 	// clear the canvas before redrawing
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -100,11 +113,16 @@ function drawKeyboard() {
 	for (var i = 0; i < keyboard[2].length; i++) {
 		drawKey(70 + 70 * i + (10), 150, keyboard[2][i], keyDown[2][i]);
 	}
+
+	drawSpacebar();
 }
 
 function keyUpHandler(e) {
 	if (e.key === "Shift") {
 		shiftDown = false;
+		requestAnimationFrame(drawKeyboard);
+	} else if (e.key === " ") {
+		spaceDown = false;
 		requestAnimationFrame(drawKeyboard);
 	} else {
 		var key = e.key.toLowerCase();
@@ -123,6 +141,9 @@ function keyUpHandler(e) {
 function keyDownHandler(e) {
 	if (e.key === "Shift") {
 		shiftDown = true;
+		requestAnimationFrame(drawKeyboard);
+	} else if (e.key === " ") {
+		spaceDown = true;
 		requestAnimationFrame(drawKeyboard);
 	} else {
 		var key = e.key.toLowerCase();
