@@ -64,17 +64,16 @@ function show() {
 	idx = Math.floor(Math.random() * remaining);
 	document.getElementById("japanese").innerHTML = japanese[idx];
 	document.getElementById("remaining").innerHTML = "残り： " + remaining;
+	document.getElementById("input").value = "";
 }
 
 function onClick() {
-	var input = document.getElementById("input");
-	if (input.value === english[idx]) {
+	if (document.getElementById("input").value === english[idx]) {
 		remaining--;
 		english[idx] = english[remaining];
 		japanese[idx] = japanese[remaining];
 
 		document.getElementById("mistake").innerHTML = "";
-		input.value = "";
 
 		if (remaining === 0) {
 			alert("終わりました！");
