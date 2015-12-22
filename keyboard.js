@@ -1,4 +1,6 @@
 /*eslint-env browser */
+const ASCII_SHIFT = 16;
+const ASCII_SPACEBAR = 32;
 /**
  * The width and height of the key.
  */
@@ -118,14 +120,19 @@ function drawKeyboard() {
 }
 
 function keyUpHandler(e) {
-	if (e.key === "Shift") {
+	if (e.keyCode === ASCII_SHIFT) {
 		shiftDown = false;
 		requestAnimationFrame(drawKeyboard);
-	} else if (e.key === " " || e.key === "Spacebar") {
+	} else if (e.keyCode === ASCII_SPACEBAR) {
 		spaceDown = false;
 		requestAnimationFrame(drawKeyboard);
 	} else {
 		var key = e.key.toLowerCase();
+		// e.key is undefined in Safari 9.0.2
+		if (key === "undefined") {
+			key = String.fromCharCode(e.charCode).toLowerCase();
+		}
+		
 		for (var i = 0; i < keyboard.length; i++) {
 			for (var j = 0; j < keyboard[i].length; j++) {
 				if (keyboard[i][j] === key) {
@@ -139,14 +146,19 @@ function keyUpHandler(e) {
 }
 
 function keyDownHandler(e) {
-	if (e.key === "Shift") {
+	if (e.keyCode === ASCII_SHIFT) {
 		shiftDown = true;
 		requestAnimationFrame(drawKeyboard);
-	} else if (e.key === " " || e.key === "Spacebar") {
+	} else if (e.keyCode === ASCII_SPACEBAR) {
 		spaceDown = true;
 		requestAnimationFrame(drawKeyboard);
 	} else {
 		var key = e.key.toLowerCase();
+		// e.key is undefined in Safari 9.0.2
+		if (key === "undefined") {
+			key = String.fromCharCode(e.charCode).toLowerCase();
+		}
+		
 		for (var i = 0; i < keyboard.length; i++) {
 			for (var j = 0; j < keyboard[i].length; j++) {
 				if (keyboard[i][j] === key) {
