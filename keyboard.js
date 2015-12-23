@@ -12,8 +12,8 @@ const KEY_DIMENSIONS = 60;
  */
 const KEY_EXPANSION_SIZE = 6;
 
-var canvas = document.getElementById("canvas");
-var ctx = canvas.getContext("2d");
+var canvasKeyboard = document.getElementById("canvas");
+var ctx = canvasKeyboard.getContext("2d");
 
 /**
  * Whether the shift key is currently being pressed by the user.
@@ -47,6 +47,8 @@ function drawKeyOutline(x, y, keyDown) {
 	}
 	
 	ctx.beginPath();
+	ctx.fillStyle = "white";
+	ctx.fillRect(x, y, dimensions, dimensions);
 	ctx.strokeStyle = "black";
 	ctx.strokeRect(x, y, dimensions, dimensions);
 	ctx.closePath();
@@ -90,17 +92,20 @@ function drawShiftKey(x, y) {
 function drawSpacebar() {
 	ctx.beginPath();
 	ctx.strokeStyle = "black";
+	ctx.fillStyle = "white";
 	if (spaceDown) {
 		ctx.strokeRect(112, 217, 486, 66);
+		ctx.fillRect(112, 217, 486, 66);
 	} else {
 		ctx.strokeRect(115, 220, 480, 60);
+		ctx.fillRect(115, 220, 480, 60);
 	}
 	ctx.closePath();
 }
 
 function drawKeyboard() {
 	// clear the canvas before redrawing
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	ctx.clearRect(0, 0, canvasKeyboard.width, canvasKeyboard.height);
 
 	// draw the top row of the keyboard
 	for (var i = 0; i < keyboard[0].length; i++) {

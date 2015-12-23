@@ -12,6 +12,8 @@ var files = null;
 var fileCounter = 0;
 var wordCounter = 0;
 
+var front = true;
+
 function handleFileSelect(e) {
 	wordCounter = 0;
 	fileCounter = 0;
@@ -59,14 +61,49 @@ function showKeyboard() {
 
 document.getElementById('files').addEventListener('change', handleFileSelect, false);
 
+function updateFlashCard() {
+	var canvasFront = document.getElementById('canvasFront');
+	var canvasBack = document.getElementById('canvasBack');
+	var contextFront = canvasFront.getContext('2d');
+	var contextBack = canvasBack.getContext('2d');
+	
+	if (front) {
+		contextBack.clearRect(0, 0, canvasBack.width, canvasBack.height);
+		
+		var x = canvasFront.width / 2;
+		var y = canvasFront.height / 2;
+		
+		contextFront.font = "30pt Calibri";
+		contextFront.textAlign = "center";
+		contextFront.textBaseline = "middle";
+		contextFront.fillStyle = "white";
+		contextFront.fillRect(0, 0, canvasFront.width, canvasFront.height);
+		contextFront.fillStyle = "black";
+		contextFront.fillText(japanese[idx], x, y);
+	} else {
+		contextFront.clearRect(0, 0, canvasFront.width, canvasFront.height);
+		
+		var x = canvasBack.width / 2;
+		var y = canvasBack.height / 2;
+		
+		contextBack.font = "30pt Calibri";
+		contextBack.textAlign = "center";
+		contextBack.textBaseline = "middle";
+		contextBack.fillStyle = "white";
+		contextBack.fillRect(0, 0, canvasBack.width, canvasBack.height);
+		contextBack.fillStyle = "black";
+		contextBack.fillText(japanese[idx], x, y);
+	}
+}
+
 function show() {
 	idx = Math.floor(Math.random() * remaining);
-	document.getElementById("japanese").innerHTML = japanese[idx];
+	updateFlashCard();
 	document.getElementById("remaining").innerHTML = "残り： " + remaining;
 	document.getElementById("input").value = "";
 }
 
-function onClick() {
+function onClick() {	
 	if (document.getElementById("input").value === english[idx]) {
 		remaining--;
 		english[idx] = english[remaining];
@@ -76,11 +113,20 @@ function onClick() {
 
 		if (remaining === 0) {
 			alert("終わりました！");
-			document.getElementById("japanese").innerHTML = "";
+			document.getElementById("front").innerHTML = "";
+			document.getElementById("back").innerHTML = "";
 			document.getElementById("remaining").innerHTML = "残り： 0";
 			document.getElementById("nextBtn").disabled = true;
 		} else {
+			front = !front;
 			show();
+		
+			var card = document.getElementById("card");
+			if (card.className === "card") {
+				card.className = "card flipped";
+			} else {
+				card.className = "card";
+			}
 		}
 	} else {
 		document.getElementById("mistake").innerHTML = "<font color=\"red\">間違った！</font>";
