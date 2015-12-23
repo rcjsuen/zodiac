@@ -1,4 +1,6 @@
 /*eslint-env browser */
+const ASCII_ENTER = 13;
+
 var english = null;
 var japanese = null;
 
@@ -86,7 +88,7 @@ function onClick() {
 }
 
 function keyDownHandler(e) {
-	if (e.key === "Enter" && remaining !== 0) {
+	if (e.keyCode === ASCII_ENTER && remaining !== 0) {
 		onClick();
 	}
 }
