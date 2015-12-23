@@ -112,9 +112,17 @@ function onClick() {
 		document.getElementById("mistake").innerHTML = "";
 
 		if (remaining === 0) {
+			var canvas = document.getElementById("canvasFront");
+			var ctx = canvas.getContext("2d");
+			ctx.fillStyle = "white";
+			ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+			canvas = document.getElementById("canvasBack");
+			ctx = canvas.getContext("2d");
+			ctx.fillStyle = "white";
+			ctx.fillRect(0, 0, canvas.width, canvas.height);
+
 			alert("終わりました！");
-			document.getElementById("front").innerHTML = "";
-			document.getElementById("back").innerHTML = "";
 			document.getElementById("remaining").innerHTML = "残り： 0";
 			document.getElementById("nextBtn").disabled = true;
 		} else {
