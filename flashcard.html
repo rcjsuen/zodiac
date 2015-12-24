@@ -103,6 +103,7 @@
 
 <p/>
 <font face="Calibri">
+<p id="remainingTime"></p>
 <p id="remaining"></p>
 </font>
 
@@ -201,13 +202,13 @@ function countdown() {
 function startTimeTrial() {
 	remainingTime = parseInt(document.getElementById("time").value, 10);
 	
-	document.getElementById("remaining").innerHTML = remainingTime + "秒";
+	document.getElementById("remainingTime").innerHTML = remainingTime + "秒";
 	setTimeout(timer, 1000);
 }
 
 function timer() {
 	remainingTime--;
-	document.getElementById("remaining").innerHTML = remainingTime + "秒";
+	document.getElementById("remainingTime").innerHTML = remainingTime + "秒";
 	if (remainingTime === 0) {
 		alert("もう時間だ！");
 	} else {
