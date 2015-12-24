@@ -38,6 +38,7 @@ function handleFileSelect(e) {
 		if (fileCounter !== files.length) {
 			reader.readAsText(files[fileCounter], "UTF-8");
 		} else {
+			document.getElementById("startBtn").disabled = false;
 			document.getElementById("nextBtn").disabled = false;
 			show();
 		}
