@@ -112,8 +112,9 @@
 		<p align="right"><font face="Calibri, Arial, Helvetica, Bitstream Sans">© 2015 Remy Suen</font></p>
 		<hr/>
 		<input type="file" id="files" multiple/><p/>
-		<input type="checkbox" id="timeCheckbox">時間制限</input>
-		<input type="number" id="time"/>&nbsp;<button id="startBtn" type="button" onClick="startCountdown()">スタート</button>
+		<input type="checkbox" id="timeCheckbox" onClick="toggleTimeTrial()">時間制限</input>
+		<input type="number" id="time" disabled/>&nbsp;
+		<button id="startBtn" type="button" onClick="startCountdown()">スタート</button>
 	</div>
 </div>
 
@@ -178,6 +179,10 @@ function timer() {
 	} else {
 		setTimeout(timer, 1000);
 	}
+}
+
+function toggleTimeTrial() {
+	document.getElementById("time").disabled = !document.getElementById("timeCheckbox").checked;
 }
 </script>
 
