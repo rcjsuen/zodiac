@@ -63,37 +63,14 @@ function showKeyboard() {
 document.getElementById('files').addEventListener('change', handleFileSelect, false);
 
 function updateFlashCard() {
-	var canvasFront = document.getElementById('canvasFront');
-	var canvasBack = document.getElementById('canvasBack');
-	var contextFront = canvasFront.getContext('2d');
-	var contextBack = canvasBack.getContext('2d');
-	
 	if (front) {
-		contextBack.clearRect(0, 0, canvasBack.width, canvasBack.height);
-		
-		var x = canvasFront.width / 2;
-		var y = canvasFront.height / 2;
-		
-		contextFront.font = "30pt Calibri";
-		contextFront.textAlign = "center";
-		contextFront.textBaseline = "middle";
-		contextFront.fillStyle = "white";
-		contextFront.fillRect(0, 0, canvasFront.width, canvasFront.height);
-		contextFront.fillStyle = "black";
-		contextFront.fillText(japanese[idx], x, y);
+		document.getElementById("frontContent").innerHTML = japanese[idx];
+		document.getElementById("frontTable").style.visibility = "visible";
+		document.getElementById("backTable").style.visibility = "hidden";
 	} else {
-		contextFront.clearRect(0, 0, canvasFront.width, canvasFront.height);
-		
-		var x = canvasBack.width / 2;
-		var y = canvasBack.height / 2;
-		
-		contextBack.font = "30pt Calibri";
-		contextBack.textAlign = "center";
-		contextBack.textBaseline = "middle";
-		contextBack.fillStyle = "white";
-		contextBack.fillRect(0, 0, canvasBack.width, canvasBack.height);
-		contextBack.fillStyle = "black";
-		contextBack.fillText(japanese[idx], x, y);
+		document.getElementById("frontTable").style.visibility = "hidden";
+		document.getElementById("backTable").style.visibility = "visible";
+		document.getElementById("backContent").innerHTML = japanese[idx];
 	}
 }
 
@@ -118,15 +95,8 @@ function onClick() {
 		document.getElementById("mistake").innerHTML = "";
 
 		if (remaining === 0) {
-			var canvas = document.getElementById("canvasFront");
-			var ctx = canvas.getContext("2d");
-			ctx.fillStyle = "white";
-			ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-			canvas = document.getElementById("canvasBack");
-			ctx = canvas.getContext("2d");
-			ctx.fillStyle = "white";
-			ctx.fillRect(0, 0, canvas.width, canvas.height);
+			document.getElementById("backContent").innerHTML = "";
+			document.getElementById("frontContent").innerHTML = "";
 
 			alert("終わりました！");
 			document.getElementById("remaining").innerHTML = "残り： 0";

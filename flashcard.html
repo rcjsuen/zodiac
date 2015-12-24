@@ -88,8 +88,20 @@
 
 <div class="flip"> 
     <div id="card" class="card"> 
-        <div class="face front" id="front"><canvas id="canvasFront" width="400" height="200"></canvas></div> 
-        <div class="face back" id="back"><canvas id="canvasBack" width="400" height="200"></canvas></div>
+        <div class="face front" id="front">
+        	<table bgcolor="#ffffff" height="200" width="400" id="frontTable">
+        		<tr>
+        			<td><p align="center" id="frontContent"></p></td>
+        		</tr>
+        	</table>
+		</div> 
+        <div class="face back" id="back">
+        	<table bgcolor="#ffffff" height="200" width="400" id="backTable">
+        		<tr>
+        			<td><p align="center" id="backContent"></p></td>
+        		</tr>
+        	</table>
+        </div>
     </div> 
 </div> 
 
@@ -121,16 +133,6 @@
 <script src="keyboard.js"></script>
 <script src="zodiac.js"></script>
 <script>
-var canvasFront = document.getElementById('canvasFront');
-var contextFront = canvasFront.getContext('2d');
-contextFront.fillStyle = "white";
-contextFront.fillRect(0, 0, canvas.width, canvas.height);
-
-var canvasBack = document.getElementById('canvasBack');
-var contextBack = canvasBack.getContext('2d');
-contextBack.fillStyle = "white";
-contextBack.fillRect(0, 0, canvasBack.width, canvasBack.height);
-
 var countdownTime = 5;
 var remainingTime = -1;
 
