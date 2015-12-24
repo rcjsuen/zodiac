@@ -1,11 +1,32 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Zodiac - Flashcard</title>
+    <title>Zodiac - Time Trial</title>
     <style>
-		canvas { display: block; margin: 0 auto; }
-		
-		body { background: #ddd; }
+		body {
+	    	background: #333333;
+	    }
+	    
+	    canvas { display: block; margin: 0 auto; }
+	      
+		.countdown {
+		    position: absolute;
+		    top: 50%;
+		    left: 50%;
+		    -moz-transform: translateX(-50%) translateY(-50%);
+		    -webkit-transform: translateX(-50%) translateY(-50%);
+		    transform: translateX(-50%) translateY(-50%);
+			background: #333333;
+		}
+	
+		.countdown > div {
+			padding: 20px;
+			border-radius: 10px;
+			background: -moz-linear-gradient(#fff, #bbb);
+			background: -webkit-linear-gradient(#fff, #bbb);
+			background: -o-linear-gradient(#fff, #bbb);
+			background: -ms-linear-gradient(#fff, #bbb);
+		}
 		
 		.flip {
 			-webkit-perspective: 800;
@@ -52,14 +73,16 @@
 		}
     </style>
   </head>
-  <body>
+  <body id="body">
+
+<div id="content" style="display: none;">
+<p align="right" id="timer"></p>
 
 <center>
 
-<input type="file" id="files" multiple/>
-
 <p/>
 <font face="Calibri">
+<p id="countdown"></p>
 <p id="remaining"></p>
 </font>
 
@@ -70,7 +93,7 @@
     </div> 
 </div> 
 
-<input id="input"/>
+<input id="input" disabled/>
 <button id="nextBtn" type="button" onClick="onClick()" disabled>次へ</button>
 <p/>
 <p align="right"><input type="checkbox" state="true" id="keyboardChk" checked="true" onClick="showKeyboard()"/>バーチャルキーボード</p>
@@ -81,6 +104,19 @@
 
 
 </center>
+</div>
+
+<div id="openModal" class="countdown">
+	<div>
+		<img src="images/logo.png"/><p/>
+		<p align="right"><font face="Calibri, Arial, Helvetica, Bitstream Sans">© 2015 Remy Suen</font></p>
+		<hr/>
+		<input type="file" id="files" multiple/><p/>
+		<input type="checkbox" id="timeCheckbox">時間制限</input>
+		<input type="number" id="time"/>&nbsp;<button id="startBtn" type="button" onClick="startCountdown()">スタート</button>
+	</div>
+</div>
+
 <script src="keyboard.js"></script>
 <script src="zodiac.js"></script>
 <script>
@@ -93,6 +129,56 @@ var canvasBack = document.getElementById('canvasBack');
 var contextBack = canvasBack.getContext('2d');
 contextBack.fillStyle = "white";
 contextBack.fillRect(0, 0, canvasBack.width, canvasBack.height);
+
+var countdownTime = 5;
+var remainingTime = -1;
+
+function startCountdown() {
+	document.getElementById("openModal").style.display = "none";
+	document.getElementById("content").style.display = "inline";
+	document.getElementById("body").style.background = "#ffffff";
+
+	if (document.getElementById("timeCheckbox").checked) {
+		document.getElementById("countdown").innerHTML = countdownTime;
+		setTimeout(countdown, 1000);
+	} else {
+		document.getElementById("countdown").style.display = "none";
+		document.getElementById("remaining").style.display = "none";
+		document.getElementById("input").disabled = false;
+		document.getElementById("input").focus();
+	}
+}
+
+function countdown() {
+	countdownTime--;
+	document.getElementById("countdown").innerHTML = countdownTime;
+	if (countdownTime === 0) {
+		document.getElementById("countdown").style.display = "none";
+		document.getElementById("input").disabled = false;
+		document.getElementById("input").focus();
+		
+		startTimeTrial();
+	} else {
+		setTimeout(countdown, 1000);
+	}
+}
+
+function startTimeTrial() {
+	remainingTime = parseInt(document.getElementById("time").value, 10);
+	
+	document.getElementById("timer").innerHTML = remainingTime + "秒";
+	setTimeout(timer, 1000);
+}
+
+function timer() {
+	remainingTime--;
+	document.getElementById("timer").innerHTML = remainingTime + "秒";
+	if (remainingTime === 0) {
+		alert("もう時間だ！");
+	} else {
+		setTimeout(timer, 1000);
+	}
+}
 </script>
 
 </body>
