@@ -47,19 +47,6 @@ function handleFileSelect(e) {
 	reader.readAsText(files[fileCounter], "UTF-8");
 }
 
-
-var enableKeyboard = true;
-
-function showKeyboard() {
-	enableKeyboard = !enableKeyboard;
-
-	if (enableKeyboard) {
-		document.getElementById("canvas").style.display = "inline";
-	} else {
-		document.getElementById("canvas").style.display = "none";
-	}
-}
-
 document.getElementById('files').addEventListener('change', handleFileSelect, false);
 
 function updateFlashCard() {

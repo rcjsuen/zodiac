@@ -108,7 +108,6 @@
 <input id="input" disabled/>
 <button id="nextBtn" type="button" onClick="onClick()" disabled>次へ</button>
 <p/>
-<p align="right"><input type="checkbox" state="true" id="keyboardChk" checked="true" onClick="showKeyboard()"/>バーチャルキーボード</p>
 
 <canvas id="canvas" width=710" height="290"></canvas>
 <p id="mistake"></p>
@@ -125,8 +124,9 @@
 		<hr/>
 		<input type="file" id="files" multiple/><p/>
 		<input type="checkbox" id="timeCheckbox" onClick="toggleTimeTrial()">時間制限</input>
-		<input type="number" id="time" disabled/>&nbsp;
-		<button id="startBtn" type="button" onClick="startCountdown()" disabled>スタート</button>
+		<input type="number" id="time" disabled/><p/>
+		<input type="checkbox" state="true" id="keyboardChk" checked="true" onClick="showKeyboard()">バーチャルキーボード</input><p/>
+		<p align="center"><button id="startBtn" type="button" onClick="startCountdown()" disabled>スタート</button></p>
 	</div>
 </div>
 
@@ -185,6 +185,18 @@ function timer() {
 
 function toggleTimeTrial() {
 	document.getElementById("time").disabled = !document.getElementById("timeCheckbox").checked;
+}
+
+var enableKeyboard = true;
+
+function showKeyboard() {
+	enableKeyboard = !enableKeyboard;
+
+	if (enableKeyboard) {
+		document.getElementById("canvas").style.display = "inline";
+	} else {
+		document.getElementById("canvas").style.display = "none";
+	}
 }
 </script>
 
