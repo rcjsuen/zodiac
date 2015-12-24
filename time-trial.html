@@ -112,6 +112,7 @@
 		<p align="right"><font face="Calibri, Arial, Helvetica, Bitstream Sans">© 2015 Remy Suen</font></p>
 		<hr/>
 		<input type="file" id="files" multiple/><p/>
+		<input type="checkbox" id="timeCheckbox">時間制限</input>
 		<input type="number" id="time"/>&nbsp;<button id="startBtn" type="button" onClick="startCountdown()">スタート</button>
 	</div>
 </div>
@@ -136,8 +137,16 @@ function startCountdown() {
 	document.getElementById("openModal").style.display = "none";
 	document.getElementById("content").style.display = "inline";
 	document.getElementById("body").style.background = "#ffffff";
-	document.getElementById("countdown").innerHTML = countdownTime;
-	setTimeout(countdown, 1000);
+
+	if (document.getElementById("timeCheckbox").checked) {
+		document.getElementById("countdown").innerHTML = countdownTime;
+		setTimeout(countdown, 1000);
+	} else {
+		document.getElementById("countdown").style.display = "none";
+		document.getElementById("remaining").style.display = "none";
+		document.getElementById("input").disabled = false;
+		document.getElementById("input").focus();
+	}
 }
 
 function countdown() {
