@@ -103,8 +103,13 @@ function show() {
 	document.getElementById("input").value = "";
 }
 
-function onClick() {	
-	if (document.getElementById("input").value === english[idx]) {
+function onClick() {
+	var input = document.getElementById("input");
+	if (input.disabled) {
+		return;
+	}
+
+	if (input.value === english[idx]) {
 		remaining--;
 		english[idx] = english[remaining];
 		japanese[idx] = japanese[remaining];
