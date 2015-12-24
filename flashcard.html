@@ -9,7 +9,7 @@
 	    
 	    canvas { display: block; margin: 0 auto; }
 	      
-		.countdown {
+		.setup {
 		    position: absolute;
 		    top: 50%;
 		    left: 50%;
@@ -19,9 +19,31 @@
 			background: #333333;
 		}
 	
-		.countdown > div {
+		.setup > div {
 			padding: 20px;
 			border-radius: 10px;
+			background: -moz-linear-gradient(#fff, #bbb);
+			background: -webkit-linear-gradient(#fff, #bbb);
+			background: -o-linear-gradient(#fff, #bbb);
+			background: -ms-linear-gradient(#fff, #bbb);
+		}
+	      
+		.countdown {
+		    position: absolute;
+		    top: 50%;
+		    left: 50%;
+		    width: 250;
+		    -moz-transform: translateX(-50%) translateY(-50%);
+		    -webkit-transform: translateX(-50%) translateY(-50%);
+		    transform: translateX(-50%) translateY(-50%);
+			background: #333333;
+		}
+	
+		.countdown > div {
+			text-align: center;
+			font-family: Calibri, Arial, Helvetica, Sans;
+			font-size: 200;
+			border-radius: 150px;
 			background: -moz-linear-gradient(#fff, #bbb);
 			background: -webkit-linear-gradient(#fff, #bbb);
 			background: -o-linear-gradient(#fff, #bbb);
@@ -76,13 +98,11 @@
   <body id="body">
 
 <div id="content" style="display: none;">
-<p align="right" id="timer"></p>
 
 <center>
 
 <p/>
 <font face="Calibri">
-<p id="countdown"></p>
 <p id="remaining"></p>
 </font>
 
@@ -117,7 +137,7 @@
 </center>
 </div>
 
-<div id="openModal" class="countdown">
+<div id="openModal" class="setup">
 	<div>
 		<img src="images/logo.png"/><p/>
 		<p align="right"><font face="Calibri, Arial, Helvetica, Bitstream Sans">© 2015 Remy Suen</font></p>
@@ -130,6 +150,12 @@
 	</div>
 </div>
 
+<div id="countdown" class="countdown" style="display: none">
+	<div>
+		<p id="countdownText">5</p>
+	</div>
+</div>
+
 <script src="keyboard.js"></script>
 <script src="zodiac.js"></script>
 <script>
@@ -137,16 +163,17 @@ var countdownTime = 5;
 var remainingTime = -1;
 
 function startCountdown() {
+	// hide the setup popup
 	document.getElementById("openModal").style.display = "none";
-	document.getElementById("content").style.display = "inline";
-	document.getElementById("body").style.background = "#ffffff";
 
 	if (document.getElementById("timeCheckbox").checked) {
-		document.getElementById("countdown").innerHTML = countdownTime;
+		// show the timer
+		document.getElementById("countdown").style.display = "inline";
 		setTimeout(countdown, 1000);
 	} else {
-		document.getElementById("countdown").style.display = "none";
+		// not a time trial, remove the field for showing the remaining time
 		document.getElementById("remaining").style.display = "none";
+		// enable the input field and grant it focus
 		document.getElementById("input").disabled = false;
 		document.getElementById("input").focus();
 	}
@@ -154,9 +181,14 @@ function startCountdown() {
 
 function countdown() {
 	countdownTime--;
-	document.getElementById("countdown").innerHTML = countdownTime;
+	document.getElementById("countdownText").innerHTML = countdownTime;
 	if (countdownTime === 0) {
+		// show the content
+		document.getElementById("body").style.background = "#ffffff";
+		document.getElementById("content").style.display = "inline";
+		// hide the countdown timer
 		document.getElementById("countdown").style.display = "none";
+		// enable the input field and grant it focus
 		document.getElementById("input").disabled = false;
 		document.getElementById("input").focus();
 		
@@ -169,13 +201,13 @@ function countdown() {
 function startTimeTrial() {
 	remainingTime = parseInt(document.getElementById("time").value, 10);
 	
-	document.getElementById("timer").innerHTML = remainingTime + "秒";
+	document.getElementById("remaining").innerHTML = remainingTime + "秒";
 	setTimeout(timer, 1000);
 }
 
 function timer() {
 	remainingTime--;
-	document.getElementById("timer").innerHTML = remainingTime + "秒";
+	document.getElementById("remaining").innerHTML = remainingTime + "秒";
 	if (remainingTime === 0) {
 		alert("もう時間だ！");
 	} else {
