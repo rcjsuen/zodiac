@@ -64,7 +64,7 @@ function updateFlashCard() {
 function show() {
 	idx = Math.floor(Math.random() * remaining);
 	updateFlashCard();
-	document.getElementById("remaining").innerHTML = "残り： " + remaining;
+	document.getElementById("remaining").innerHTML = "残り： " + remaining + "/" + wordCounter;
 	document.getElementById("input").value = "";
 }
 
@@ -86,7 +86,7 @@ function onClick() {
 			document.getElementById("frontContent").innerHTML = "";
 
 			alert("終わりました！");
-			document.getElementById("remaining").innerHTML = "残り： 0";
+			document.getElementById("remaining").innerHTML = "残り： 0/" + wordCounter;
 			document.getElementById("nextBtn").disabled = true;
 		} else {
 			front = !front;
