@@ -142,6 +142,11 @@ function getEventKey(e) {
 }
 
 function keyUpHandler(e) {
+	var input = document.getElementById("input");
+	if (input.disabled) {
+		return;
+	}
+	
 	if (e.keyCode === ASCII_SHIFT) {
 		shiftDown = false;
 		requestAnimationFrame(drawKeyboard);
@@ -164,6 +169,11 @@ function keyUpHandler(e) {
 }
 
 function keyDownHandler(e) {
+	var input = document.getElementById("input");
+	if (input.disabled) {
+		return;
+	}
+	
 	if (e.keyCode === ASCII_SHIFT) {
 		shiftDown = true;
 		requestAnimationFrame(drawKeyboard);

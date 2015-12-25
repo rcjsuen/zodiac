@@ -33,22 +33,11 @@
 		    position: absolute;
 		    top: 50%;
 		    left: 50%;
-		    width: 250;
+		    width: 500;
 		    -moz-transform: translateX(-50%) translateY(-50%);
 		    -webkit-transform: translateX(-50%) translateY(-50%);
 		    transform: translateX(-50%) translateY(-50%);
 			background: #333333;
-		}
-	
-		.countdown > div {
-			text-align: center;
-			font-family: Calibri, Arial, Helvetica, Sans;
-			font-size: 200;
-			border-radius: 150px;
-			background: -moz-linear-gradient(#fff, #bbb);
-			background: -webkit-linear-gradient(#fff, #bbb);
-			background: -o-linear-gradient(#fff, #bbb);
-			background: -ms-linear-gradient(#fff, #bbb);
 		}
 		
 		.flip {
@@ -163,9 +152,7 @@
 </div>
 
 <div id="countdown" class="countdown" style="display: none">
-	<div>
-		<p id="countdownText">5</p>
-	</div>
+	<canvas id="countdownCanvas" width="500" height="500"></canvas>
 </div>
 
 <div id="report" class="setup" style="display: none">

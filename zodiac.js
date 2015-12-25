@@ -119,7 +119,7 @@ function startCountdown() {
 	if (document.getElementById("timeCheckbox").checked) {
 		// show the timer
 		document.getElementById("countdown").style.display = "inline";
-		setTimeout(countdown, 1000);
+		drawCountdownCanvas();
 	} else {
 		// not a time trial, remove the field for showing the remaining time
 		document.getElementById("remainingTime").style.display = "none";
@@ -162,26 +162,6 @@ function showReport() {
 	document.getElementById("report").style.display = "inline";
 }
 
-function countdown() {
-	countdownTime--;
-	document.getElementById("countdownText").innerHTML = countdownTime;
-	if (countdownTime === 0) {
-		// show the content
-		document.getElementById("body").style.background = "#ffffff";
-		document.getElementById("content").style.display = "inline";
-		// hide the countdown timer
-		document.getElementById("countdown").style.display = "none";
-		// enable the input field and grant it focus
-		document.getElementById("input").disabled = false;
-		document.getElementById("input").focus();
-		startTime = new Date().getTime();
-		
-		startTimeTrial();
-	} else {
-		setTimeout(countdown, 1000);
-	}
-}
-
 function startTimeTrial() {
 	timeLimit = parseInt(document.getElementById("time").value, 10);
 	remainingTime = timeLimit;
@@ -207,3 +187,72 @@ function keyDownHandler(e) {
 }
 
 document.addEventListener("keydown", keyDownHandler, false);
+
+var canvas = document.getElementById("countdownCanvas");
+var ctx = canvas.getContext("2d");
+var startPoint = 0 - (Math.PI / 2);
+
+var start = -1;
+var time = 5;
+
+function drawCountdownCanvas() {
+	if (start === -1) {
+		start = new Date().getTime();
+	}
+	var now = new Date().getTime();
+	if (now - start >= time * 1000) {
+		ctx.fillStyle = "black";
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		ctx.beginPath();
+		ctx.moveTo(250, 250);
+		ctx.arc(250, 250, 200, startPoint, Math.PI * 2);
+			ctx.fill();
+		ctx.closePath();
+		
+		ctx.fillStyle = "#eeeeee";
+		ctx.beginPath();
+		ctx.moveTo(250, 250);
+		ctx.arc(250, 250, 190, startPoint, Math.PI * 2);
+		ctx.fill();
+		
+		// show the content
+		document.getElementById("body").style.background = "#ffffff";
+		document.getElementById("content").style.display = "inline";
+		// hide the countdown timer
+		document.getElementById("countdown").style.display = "none";
+		// enable the input field and grant it focus
+		document.getElementById("input").disabled = false;
+		document.getElementById("input").focus();
+		startTime = new Date().getTime();
+		
+		startTimeTrial();
+		return;
+	}
+	
+	var pct = ((now - start) % 1000) / 1000;
+	
+	ctx.fillStyle = "black";
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	ctx.beginPath();
+	ctx.moveTo(250, 250);
+	ctx.arc(250, 250, 200, startPoint, startPoint + (Math.PI * 2 * (pct)));
+		ctx.fill();
+	ctx.closePath();
+	
+	ctx.fillStyle = "#eeeeee";
+	ctx.beginPath();
+	ctx.moveTo(250, 250);
+	ctx.arc(250, 250, 190, startPoint, startPoint + (Math.PI * 2 * (pct)));
+		ctx.fill();
+	ctx.closePath();
+	
+	ctx.beginPath();
+	ctx.font = "400px Calibri";
+	ctx.fillStyle = "black";
+	ctx.textAlign = "center";
+	ctx.textBaseline = "middle";
+	ctx.fillText(5 - Math.floor((now - start) / 1000), 250, 250);
+	ctx.closePath();
+	
+	requestAnimationFrame(drawCountdownCanvas);
+}
