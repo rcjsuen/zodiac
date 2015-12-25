@@ -174,6 +174,9 @@ function startCountdown() {
 	} else {
 		// not a time trial, remove the field for showing the remaining time
 		document.getElementById("remaining").style.display = "none";
+		// show the content
+		document.getElementById("body").style.background = "#ffffff";
+		document.getElementById("content").style.display = "inline";
 		// enable the input field and grant it focus
 		document.getElementById("input").disabled = false;
 		document.getElementById("input").focus();
