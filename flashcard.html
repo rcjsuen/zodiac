@@ -8,9 +8,10 @@
 	    }
 	    
 	    canvas { display: block; margin: 0 auto; }
-	      
-		.setup {
-		    position: absolute;
+	    
+	    .setup {
+	    	font-family: Calibri, Arial, Helvetica, Bitstream Sans;
+			position: absolute;
 		    top: 50%;
 		    left: 50%;
 		    -moz-transform: translateX(-50%) translateY(-50%);
@@ -27,7 +28,7 @@
 			background: -o-linear-gradient(#fff, #bbb);
 			background: -ms-linear-gradient(#fff, #bbb);
 		}
-	      
+
 		.countdown {
 		    position: absolute;
 		    top: 50%;
@@ -141,7 +142,7 @@
 <div id="openModal" class="setup">
 	<div>
 		<img src="images/logo.png"/><p/>
-		<p align="right"><font face="Calibri, Arial, Helvetica, Bitstream Sans">© 2015 Remy Suen</font></p>
+		<p align="right">© 2015 Remy Suen</p>
 		<hr/>
 		<input type="file" id="files" multiple/><p/>
 		<input type="checkbox" id="timeCheckbox" onClick="toggleTimeTrial()">時間制限</input>
@@ -157,68 +158,19 @@
 	</div>
 </div>
 
+<div id="report" class="setup" style="display: none">
+	<div>
+		<h2>
+		<p id="reportTimeLimit"></p>
+		<p id="reportRemainingTime"></p>
+		<p id="reportRemainingCards"></p>
+		</h2>
+	</div>
+</div>
+
 <script src="keyboard.js"></script>
 <script src="zodiac.js"></script>
 <script>
-var countdownTime = 5;
-var remainingTime = -1;
-
-function startCountdown() {
-	// hide the setup popup
-	document.getElementById("openModal").style.display = "none";
-
-	if (document.getElementById("timeCheckbox").checked) {
-		// show the timer
-		document.getElementById("countdown").style.display = "inline";
-		setTimeout(countdown, 1000);
-	} else {
-		// not a time trial, remove the field for showing the remaining time
-		document.getElementById("remainingTime").style.display = "none";
-		// show the content
-		document.getElementById("body").style.background = "#ffffff";
-		document.getElementById("content").style.display = "inline";
-		// enable the input field and grant it focus
-		document.getElementById("input").disabled = false;
-		document.getElementById("input").focus();
-	}
-}
-
-function countdown() {
-	countdownTime--;
-	document.getElementById("countdownText").innerHTML = countdownTime;
-	if (countdownTime === 0) {
-		// show the content
-		document.getElementById("body").style.background = "#ffffff";
-		document.getElementById("content").style.display = "inline";
-		// hide the countdown timer
-		document.getElementById("countdown").style.display = "none";
-		// enable the input field and grant it focus
-		document.getElementById("input").disabled = false;
-		document.getElementById("input").focus();
-		
-		startTimeTrial();
-	} else {
-		setTimeout(countdown, 1000);
-	}
-}
-
-function startTimeTrial() {
-	remainingTime = parseInt(document.getElementById("time").value, 10);
-	
-	document.getElementById("remainingTime").innerHTML = remainingTime + "秒";
-	setTimeout(timer, 1000);
-}
-
-function timer() {
-	remainingTime--;
-	document.getElementById("remainingTime").innerHTML = remainingTime + "秒";
-	if (remainingTime === 0) {
-		alert("もう時間だ！");
-	} else {
-		setTimeout(timer, 1000);
-	}
-}
-
 function toggleTimeTrial() {
 	document.getElementById("time").disabled = !document.getElementById("timeCheckbox").checked;
 }
