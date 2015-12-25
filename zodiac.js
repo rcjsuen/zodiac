@@ -124,7 +124,7 @@ function startCountdown() {
 		// not a time trial, remove the field for showing the remaining time
 		document.getElementById("remainingTime").style.display = "none";
 		// show the content
-		document.getElementById("body").style.background = "#ffffff";
+		document.getElementById("body").style.background = "#eeeeee";
 		document.getElementById("content").style.display = "inline";
 		// enable the input field and grant it focus
 		document.getElementById("input").disabled = false;
