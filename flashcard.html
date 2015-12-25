@@ -113,22 +113,22 @@
         <div class="face front" id="front">
         	<table bgcolor="#ffffff" height="200" width="400" id="frontTable">
         		<tr>
-        			<td><p align="center" id="frontContent"></p></td>
+        			<td><p align="center" style="font-size: 40px" id="frontContent"></p></td>
         		</tr>
         	</table>
 		</div> 
         <div class="face back" id="back">
         	<table bgcolor="#ffffff" height="200" width="400" id="backTable">
         		<tr>
-        			<td><p align="center" id="backContent"></p></td>
+        			<td><p align="center" style="font-size: 40px" id="backContent"></p></td>
         		</tr>
         	</table>
         </div>
     </div> 
 </div> 
 
-<input id="input" disabled/>
-<button id="nextBtn" type="button" onClick="onClick()" disabled>次へ</button>
+<input id="input" style="font-size: 50px; text-align: center" type="text" disabled/>
+<button id="nextBtn" style="font-size: 50px" type="button" onClick="onClick()" disabled>次へ</button>
 <p/>
 
 <canvas id="canvas" width=710" height="290"></canvas>
@@ -160,11 +160,9 @@
 
 <div id="report" class="setup" style="display: none">
 	<div>
-		<h2>
-		<p id="reportTimeLimit"></p>
-		<p id="reportRemainingTime"></p>
-		<p id="reportRemainingCards"></p>
-		</h2>
+		<p id="reportTimeLimit" style="font-size: 50px"></p>
+		<p id="reportRemainingTime" style="font-size: 50px"></p>
+		<p id="reportRemainingCards" style="font-size: 50px"></p>
 	</div>
 </div>
 
