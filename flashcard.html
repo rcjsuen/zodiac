@@ -94,6 +94,16 @@
 			transform: rotatex(-180deg);
 			-webkit-transform: rotatex(-180deg);
 		}
+		
+		.general {
+	    	font-family: Calibri, Arial, Helvetica, Bitstream Sans;
+	    	font-size: 25px;
+		}
+		
+		.report {
+	    	font-family: Calibri, Arial, Helvetica, Bitstream Sans;
+	    	font-size: 50px;
+		}
     </style>
   </head>
   <body id="body">
@@ -104,8 +114,8 @@
 
 <p/>
 <font face="Calibri">
-<p id="remainingTime"></p>
-<p id="remaining"></p>
+<p id="remainingTime" class="general"></p>
+<p id="remaining" class="general"></p>
 </font>
 
 <div class="flip"> 
@@ -132,7 +142,7 @@
 <p/>
 
 <canvas id="canvas" width=710" height="290"></canvas>
-<p id="mistake"></p>
+<p id="mistake" class="general"></p>
 <p/>
 
 
@@ -160,9 +170,9 @@
 
 <div id="report" class="setup" style="display: none">
 	<div>
-		<p id="reportTimeLimit" style="font-size: 50px"></p>
-		<p id="reportRemainingTime" style="font-size: 50px"></p>
-		<p id="reportRemainingCards" style="font-size: 50px"></p>
+		<p id="reportTimeLimit" class="report"></p>
+		<p id="reportRemainingTime" class="report"></p>
+		<p id="reportRemainingCards" class="report"></p>
 	</div>
 </div>
 
