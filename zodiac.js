@@ -201,8 +201,11 @@ function drawCountdownCanvas() {
 	}
 	var now = new Date().getTime();
 	if (now - start >= time * 1000) {
-		ctx.fillStyle = "black";
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		ctx.shadowOffsetX = 0;
+		ctx.shadowOffsetY = 0;
+		
+		ctx.fillStyle = "black";
 		ctx.beginPath();
 		ctx.moveTo(250, 250);
 		ctx.arc(250, 250, 200, startPoint, Math.PI * 2);
@@ -230,28 +233,74 @@ function drawCountdownCanvas() {
 	}
 	
 	var pct = ((now - start) % 1000) / 1000;
+	var timeLeft = 5 - Math.floor((now - start) / 1000);
 	
-	ctx.fillStyle = "black";
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	ctx.shadowOffsetX = 0;
+	ctx.shadowOffsetY = 0;
+	
+	switch (timeLeft) {
+		case 5:
+		case 4:
+			ctx.fillStyle = "#33cc33";
+			break;
+		case 3:
+		case 2:
+			ctx.fillStyle = "#cccc00";
+			break;
+		case 1:
+			ctx.fillStyle = "#cc0000";
+			break;
+	}
 	ctx.beginPath();
 	ctx.moveTo(250, 250);
-	ctx.arc(250, 250, 200, startPoint, startPoint + (Math.PI * 2 * (pct)));
-		ctx.fill();
+	ctx.arc(250, 250, 230, startPoint, startPoint + (Math.PI * 2 * (.2 * (6 - timeLeft))));
+	ctx.fill();
 	ctx.closePath();
 	
-	ctx.fillStyle = "#eeeeee";
+	ctx.beginPath();
+	ctx.fillStyle = "#333333";
+	ctx.moveTo(250, 250);
+	ctx.arc(250, 250, 215, startPoint, Math.PI * 2);
+	ctx.fill();
+	ctx.closePath();
+	
+	ctx.beginPath();
+	ctx.fillStyle = "white";
+	ctx.moveTo(250, 250);
+	ctx.arc(250, 250, 200, startPoint, startPoint + (Math.PI * 2 * (pct)));
+	ctx.fill();
+	ctx.closePath();
+	
+	switch (timeLeft) {
+		case 5:
+		case 4:
+			ctx.fillStyle = "#33cc33";
+			break;
+		case 3:
+		case 2:
+			ctx.fillStyle = "#cccc00";
+			break;
+		case 1:
+			ctx.fillStyle = "#cc0000";
+			break;
+	}
+	
 	ctx.beginPath();
 	ctx.moveTo(250, 250);
 	ctx.arc(250, 250, 190, startPoint, startPoint + (Math.PI * 2 * (pct)));
-		ctx.fill();
+	ctx.fill();
 	ctx.closePath();
 	
 	ctx.beginPath();
 	ctx.font = "400px Calibri";
-	ctx.fillStyle = "black";
+	ctx.fillStyle = "white";
+	ctx.shadowColor = "black";
+	ctx.shadowOffsetX = 5;
+	ctx.shadowOffsetY = 5;
 	ctx.textAlign = "center";
 	ctx.textBaseline = "middle";
-	ctx.fillText(5 - Math.floor((now - start) / 1000), 250, 250);
+	ctx.fillText(timeLeft, 250, 250);
 	ctx.closePath();
 	
 	requestAnimationFrame(drawCountdownCanvas);
