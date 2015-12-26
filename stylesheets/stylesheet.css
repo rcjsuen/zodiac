@@ -1,6 +1,16 @@
 * {
   box-sizing: border-box; }
 
+.mobileHide { display: inline; }
+.mobileShow { display: none; }
+
+@media only screen
+		and (min-device-width : 320px)
+		and (max-device-width : 480px) {
+	.mobileHide { display: none; }
+	.mobileShow { display: inline; }
+}
+
 body {
   padding: 0;
   margin: 0;
