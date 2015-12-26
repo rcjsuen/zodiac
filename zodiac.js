@@ -121,8 +121,8 @@ function startCountdown() {
 		document.getElementById("countdown").style.display = "inline";
 		drawCountdownCanvas();
 	} else {
-		// not a time trial, remove the field for showing the remaining time
-		document.getElementById("remainingTime").style.display = "none";
+		// not a time trial, remove the trial timer
+		document.getElementById("trialTimer").style.display = "none";
 		// show the content
 		document.getElementById("body").style.background = "#eeeeee";
 		document.getElementById("content").style.display = "inline";
