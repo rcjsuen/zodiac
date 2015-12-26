@@ -14,6 +14,36 @@ var wordCounter = 0;
 
 var front = true;
 
+function handleSampleSelect(fileName) {
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function() {
+		if (xhttp.readyState === 4 && xhttp.status === 200) {
+			wordCounter = 0;
+			fileCounter = 0;
+			english = [];
+			japanese = [];
+			
+			var text =  xhttp.responseText;
+			var strings = text.split("\r");
+			for (var i = 0; i < strings.length / 2; i++) {
+				english[wordCounter] = strings[i * 2].trim();
+				japanese[wordCounter] = strings[(i * 2) + 1].trim();
+				wordCounter++;
+			}
+			count = english.length;
+			remaining = count;
+	
+			fileCounter++;
+	
+			document.getElementById("startBtn").disabled = false;
+			document.getElementById("nextBtn").disabled = false;
+			show();
+		}
+	};
+	xhttp.open("GET", "words/" + fileName, true);
+	xhttp.send();
+}
+
 function handleFileSelect(e) {
 	wordCounter = 0;
 	fileCounter = 0;

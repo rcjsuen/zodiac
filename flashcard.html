@@ -39,6 +39,16 @@
 		    transform: translateX(-50%) translateY(-50%);
 			background: #333333;
 		}
+
+		.sample {
+		    position: absolute;
+		    top: 50%;
+		    left: 50%;
+		    -moz-transform: translateX(-50%) translateY(-50%);
+		    -webkit-transform: translateX(-50%) translateY(-50%);
+		    transform: translateX(-50%) translateY(-50%);
+		    width: 600;
+		}
 		
 		.flip {
 			-webkit-perspective: 800;
@@ -98,6 +108,32 @@
 			font-size: 50px;
 			text-align: center;
 		}
+		
+		.close {
+		    font-family: Calibri, Arial, Helvetica, sans-serif;
+		    font-size: 22px;
+		    background: #606061;
+		    color: #FFFFFF;
+		    line-height: 28px;
+		    position: absolute;
+		    margin-bottom: 210;
+		    bottom: 50%;
+		    left: 50%;
+		    margin-left: 386;
+		    width: 28px;
+		    text-align: center;
+		    text-decoration: none;
+		    font-weight: bold;
+		    -webkit-border-radius: 12px;
+		    -moz-border-radius: 12px;
+		    border-radius: 12px;
+		    -moz-box-shadow: 1px 1px 3px #000;
+		    -webkit-box-shadow: 1px 1px 3px #000;
+		    box-shadow: 1px 1px 3px #000;
+			cursor: pointer;
+		}
+
+		.close:hover { background: #1bb1ee; }
     </style>
   </head>
   <body id="body">
@@ -126,8 +162,8 @@
         		</tr>
         	</table>
         </div>
-    </div> 
-</div> 
+    </div>
+</div>
 
 <input id="input" class="input" type="text" disabled/>
 <button id="nextBtn" class="input" type="button" onClick="onClick()" disabled>次へ</button>
@@ -146,7 +182,13 @@
 		<img src="images/logo.png"/><p/>
 		<p align="right">© 2015 Remy Suen</p>
 		<hr/>
-		<input type="file" id="files" multiple/><p/>
+		<input type="radio" id="local" label="Local File" name="file" onClick="onLocalClick()" checked="true">ローカル　ファイル</input>
+		<input type="file" id="files" multiple/>
+		<p>
+			<input type="radio" id="local" label="Samples" name="file" onClick="onSampleClick()" autocomplete="off">サンプル　ファイル</input>
+			<span id="sampleName"></span>
+		</p>
+		<p/>
 		<input type="checkbox" id="timeCheckbox" onClick="toggleTimeTrial()">時間制限</input>
 		<input type="number" id="time" disabled/><p/>
 		<input type="checkbox" state="true" id="keyboardChk" checked="true" onClick="showKeyboard()">バーチャルキーボード</input><p/>
@@ -166,9 +208,45 @@
 	</div>
 </div>
 
+<div id="sample" class="sample" style="display: none">
+<iframe id="sampleFrame" frameborder="0" src="list.html" width="700" height="450"></iframe>
+</div>
+
+<a id="sampleClose" class="close" style="display: none">X</a>
+
 <script src="keyboard.js"></script>
 <script src="zodiac.js"></script>
 <script>
+document.getElementById("local").setAttribute("checked", true);
+
+document.getElementById("sampleClose").addEventListener("click", function() {
+	document.getElementById("sample").style.display = "none";
+	document.getElementById("sampleClose").style.display = "none";
+	
+	var iframe = document.getElementById("sampleFrame");
+	var navbar = iframe.contentDocument.getElementById("navbar");
+	var bullets = navbar.getElementsByTagName('li');
+	for (var i = 0; i < bullets.length; i++) {
+		var anchor = bullets[i].getElementsByTagName("a")[0];		
+		if (anchor.hasAttribute("class")) {
+			document.getElementById("sampleName").innerHTML = anchor.innerHTML;
+			handleSampleSelect(anchor.innerHTML + ".txt");
+			break;
+		}
+	}
+});
+
+function onLocalClick() {
+	document.getElementById("files").disabled = false;
+}
+
+function onSampleClick() {
+	document.getElementById("files").disabled = true;
+
+	document.getElementById("sample").style.display = "inline";
+	document.getElementById("sampleClose").style.display = "inline";
+}
+
 /**
  * Callback function when the user checks or unchecks the time trial checkbox.
  */

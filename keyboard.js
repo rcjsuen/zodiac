@@ -13,7 +13,7 @@ const KEY_DIMENSIONS = 60;
 const KEY_EXPANSION_SIZE = 6;
 
 var canvasKeyboard = document.getElementById("canvas");
-var ctx = canvasKeyboard.getContext("2d");
+var keyboardCtx = canvasKeyboard.getContext("2d");
 
 /**
  * Whether the shift key is currently being pressed by the user.
@@ -46,12 +46,12 @@ function drawKeyOutline(x, y, keyDown) {
 		dimensions = KEY_DIMENSIONS + KEY_EXPANSION_SIZE;
 	}
 	
-	ctx.beginPath();
-	ctx.fillStyle = "white";
-	ctx.fillRect(x, y, dimensions, dimensions);
-	ctx.strokeStyle = "black";
-	ctx.strokeRect(x, y, dimensions, dimensions);
-	ctx.closePath();
+	keyboardCtx.beginPath();
+	keyboardCtx.fillStyle = "white";
+	keyboardCtx.fillRect(x, y, dimensions, dimensions);
+	keyboardCtx.strokeStyle = "black";
+	keyboardCtx.strokeRect(x, y, dimensions, dimensions);
+	keyboardCtx.closePath();
 }
 
 function drawKey(x, y, letter, keyDown) {
@@ -64,25 +64,25 @@ function drawCharacter(x, y, height, width, letter, keydown) {
 		letter = letter.toUpperCase();	
 	}
 	
-	ctx.beginPath();
-	ctx.font = keydown ? "40pt Verdana" : "20pt Verdana";
-	ctx.textAlign = "center";
-	ctx.textBaseline = "middle";
-	ctx.fillStyle = keydown ? "red" : "blue";
-	ctx.fillText(letter, (x + x + width) / 2, (y + y + height) / 2);
-	ctx.closePath();
+	keyboardCtx.beginPath();
+	keyboardCtx.font = keydown ? "40pt Verdana" : "20pt Verdana";
+	keyboardCtx.textAlign = "center";
+	keyboardCtx.textBaseline = "middle";
+	keyboardCtx.fillStyle = keydown ? "red" : "blue";
+	keyboardCtx.fillText(letter, (x + x + width) / 2, (y + y + height) / 2);
+	keyboardCtx.closePath();
 }
 
 function drawShiftKey(x, y) {
 	drawKeyOutline(x, y);
 
-	ctx.beginPath();
-	ctx.font = "15pt Verdana";
-	ctx.textAlign = "center";
-	ctx.textBaseline = "middle";
-	ctx.fillStyle = shiftDown ? "red" : "blue";
-	ctx.fillText("shift", (x + x + 60) / 2, (y + y + 60) / 2);
-	ctx.closePath();
+	keyboardCtx.beginPath();
+	keyboardCtx.font = "15pt Verdana";
+	keyboardCtx.textAlign = "center";
+	keyboardCtx.textBaseline = "middle";
+	keyboardCtx.fillStyle = shiftDown ? "red" : "blue";
+	keyboardCtx.fillText("shift", (x + x + 60) / 2, (y + y + 60) / 2);
+	keyboardCtx.closePath();
 }
 
 /**
@@ -90,22 +90,22 @@ function drawShiftKey(x, y) {
  */
 
 function drawSpacebar() {
-	ctx.beginPath();
-	ctx.strokeStyle = "black";
-	ctx.fillStyle = "white";
+	keyboardCtx.beginPath();
+	keyboardCtx.strokeStyle = "black";
+	keyboardCtx.fillStyle = "white";
 	if (spaceDown) {
-		ctx.strokeRect(112, 217, 486, 66);
-		ctx.fillRect(112, 217, 486, 66);
+		keyboardCtx.strokeRect(112, 217, 486, 66);
+		keyboardCtx.fillRect(112, 217, 486, 66);
 	} else {
-		ctx.strokeRect(115, 220, 480, 60);
-		ctx.fillRect(115, 220, 480, 60);
+		keyboardCtx.strokeRect(115, 220, 480, 60);
+		keyboardCtx.fillRect(115, 220, 480, 60);
 	}
-	ctx.closePath();
+	keyboardCtx.closePath();
 }
 
 function drawKeyboard() {
 	// clear the canvas before redrawing
-	ctx.clearRect(0, 0, canvasKeyboard.width, canvasKeyboard.height);
+	keyboardCtx.clearRect(0, 0, canvasKeyboard.width, canvasKeyboard.height);
 
 	// draw the top row of the keyboard
 	for (var i = 0; i < keyboard[0].length; i++) {
