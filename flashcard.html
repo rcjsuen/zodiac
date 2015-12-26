@@ -102,10 +102,8 @@
 <center>
 
 <p/>
-<font face="Calibri">
 <p><canvas id="trialTimer" width="100" height="100"/></p>
 <p id="remaining" class="general"></p>
-</font>
 
 <div class="flip"> 
     <div id="card" class="card"> 
@@ -166,7 +164,11 @@
 <script src="keyboard.js"></script>
 <script src="zodiac.js"></script>
 <script>
+/**
+ * Callback function when the user checks or unchecks the time trial checkbox.
+ */
 function toggleTimeTrial() {
+	// if it's not a time trial, disable the time limit input field
 	document.getElementById("time").disabled = !document.getElementById("timeCheckbox").checked;
 }
 
