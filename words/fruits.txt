@@ -1,0 +1,14 @@
+apple
+りんご
+orange
+オレンジ
+melon
+メロン
+lemon
+レモン
+banana
+バナナ
+strawberry
+いちご
+peach
+もも

@@ -1,0 +1,272 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Zodiac - Time Trial</title>
+    <style>
+		body {
+	    	background: #333333;
+	    }
+	    
+	    canvas { display: block; margin: 0 auto; }
+	    
+	    .setup {
+	    	font-family: Calibri, Arial, Helvetica, Bitstream Sans;
+			position: absolute;
+		    top: 50%;
+		    left: 50%;
+		    -moz-transform: translateX(-50%) translateY(-50%);
+		    -webkit-transform: translateX(-50%) translateY(-50%);
+		    transform: translateX(-50%) translateY(-50%);
+			background: #333333;
+		}
+	
+		.setup > div {
+			padding: 20px;
+			border-radius: 10px;
+			background: -moz-linear-gradient(#fff, #bbb);
+			background: -webkit-linear-gradient(#fff, #bbb);
+			background: -o-linear-gradient(#fff, #bbb);
+			background: -ms-linear-gradient(#fff, #bbb);
+		}
+
+		.countdown {
+		    position: absolute;
+		    top: 50%;
+		    left: 50%;
+		    width: 500;
+		    -moz-transform: translateX(-50%) translateY(-50%);
+		    -webkit-transform: translateX(-50%) translateY(-50%);
+		    transform: translateX(-50%) translateY(-50%);
+			background: #333333;
+		}
+
+		.sample {
+		    position: absolute;
+		    top: 50%;
+		    left: 50%;
+		    -moz-transform: translateX(-50%) translateY(-50%);
+		    -webkit-transform: translateX(-50%) translateY(-50%);
+		    transform: translateX(-50%) translateY(-50%);
+		    width: 600;
+		}
+		
+		.flip {
+			-webkit-perspective: 800;
+			width: 400px;
+			height: 200px;
+			position: relative;
+			margin: 25px auto;
+		}
+
+		.flip .card.flipped {
+			transform: rotatex(-180deg);
+			-moz-transform: rotatex(-180deg);
+			-webkit-transform: rotatex(-180deg);
+		}
+		
+		.flip .card {
+			width: 100%;
+			height: 100%;
+			transform-style: preserve-3d;
+			-webkit-transform-style: preserve-3d;
+			transition: 0.5s;
+			-webkit-transition: 0.5s;
+		}
+
+		.flip .card .face {
+			border-style: solid;
+			width: 100%;
+			height: 100%;
+			position: absolute;
+			font-family: Calibri;
+			font-size: 3em;
+			text-align: center;
+		}
+		
+		.flip .card .front {
+			border-style: solid;
+			position: absolute;
+		}
+		
+		.flip .card .back {
+			border-style: solid;
+			transform: rotatex(-180deg);
+			-webkit-transform: rotatex(-180deg);
+		}
+		
+		.general {
+	    	font-family: Calibri, Arial, Helvetica, Bitstream Sans;
+	    	font-size: 25px;
+		}
+		
+		.report {
+	    	font-family: Calibri, Arial, Helvetica, Bitstream Sans;
+	    	font-size: 50px;
+		}
+		
+		.input {
+			font-size: 50px;
+			text-align: center;
+		}
+		
+		.close {
+		    font-family: Calibri, Arial, Helvetica, sans-serif;
+		    font-size: 22px;
+		    background: #606061;
+		    color: #FFFFFF;
+		    line-height: 28px;
+		    position: absolute;
+		    margin-bottom: 210;
+		    bottom: 50%;
+		    left: 50%;
+		    margin-left: 386;
+		    width: 28px;
+		    text-align: center;
+		    text-decoration: none;
+		    font-weight: bold;
+		    -webkit-border-radius: 12px;
+		    -moz-border-radius: 12px;
+		    border-radius: 12px;
+		    -moz-box-shadow: 1px 1px 3px #000;
+		    -webkit-box-shadow: 1px 1px 3px #000;
+		    box-shadow: 1px 1px 3px #000;
+			cursor: pointer;
+		}
+
+		.close:hover { background: #1bb1ee; }
+    </style>
+  </head>
+  <body id="body">
+
+<div id="content" style="display: none;">
+
+<center>
+
+<p/>
+<p><canvas id="trialTimer" width="100" height="100"/></p>
+<p id="remaining" class="general"></p>
+
+<div class="flip"> 
+    <div id="card" class="card"> 
+        <div class="face front" id="front">
+        	<table bgcolor="#ffffff" height="200" width="400" id="frontTable">
+        		<tr>
+        			<td><p align="center" style="font-size: 40px" id="frontContent"></p></td>
+        		</tr>
+        	</table>
+		</div> 
+        <div class="face back" id="back">
+        	<table bgcolor="#ffffff" height="200" width="400" id="backTable">
+        		<tr>
+        			<td><p align="center" style="font-size: 40px" id="backContent"></p></td>
+        		</tr>
+        	</table>
+        </div>
+    </div>
+</div>
+
+<input id="input" class="input" type="text" disabled/>
+<button id="nextBtn" class="input" type="button" onClick="onClick()" disabled>次へ</button>
+<p/>
+
+<canvas id="canvas" width=710" height="290"></canvas>
+<p id="mistake" class="general"></p>
+<p/>
+
+
+</center>
+</div>
+
+<div id="openModal" class="setup">
+	<div>
+		<img src="images/logo.png"/><p/>
+		<p align="right">© 2015 Remy Suen</p>
+		<hr/>
+		<input type="radio" id="local" label="Local File" name="file" onClick="onLocalClick()" checked="true">ローカル　ファイル</input>
+		<input type="file" id="files" multiple/>
+		<p>
+			<input type="radio" id="local" label="Samples" name="file" onClick="onSampleClick()" autocomplete="off">サンプル　ファイル</input>
+			<span id="sampleName"></span>
+		</p>
+		<p/>
+		<input type="checkbox" id="timeCheckbox" onClick="toggleTimeTrial()">時間制限</input>
+		<input type="number" id="time" disabled/><p/>
+		<input type="checkbox" state="true" id="keyboardChk" checked="true" onClick="showKeyboard()">バーチャルキーボード</input><p/>
+		<p align="center"><button id="startBtn" type="button" onClick="startCountdown()" disabled>スタート</button></p>
+	</div>
+</div>
+
+<div id="countdown" class="countdown" style="display: none">
+	<canvas id="countdownCanvas" width="500" height="500"></canvas>
+</div>
+
+<div id="report" class="setup" style="display: none">
+	<div>
+		<p id="reportTimeLimit" class="report"></p>
+		<p id="reportRemainingTime" class="report"></p>
+		<p id="reportRemainingCards" class="report"></p>
+	</div>
+</div>
+
+<div id="sample" class="sample" style="display: none">
+<iframe id="sampleFrame" frameborder="0" src="list.html" width="700" height="450"></iframe>
+</div>
+
+<a id="sampleClose" class="close" style="display: none">X</a>
+
+<script src="keyboard.js"></script>
+<script src="zodiac.js"></script>
+<script>
+document.getElementById("local").setAttribute("checked", true);
+
+document.getElementById("sampleClose").addEventListener("click", function() {
+	document.getElementById("sample").style.display = "none";
+	document.getElementById("sampleClose").style.display = "none";
+	
+	var iframe = document.getElementById("sampleFrame");
+	var navbar = iframe.contentDocument.getElementById("navbar");
+	var bullets = navbar.getElementsByTagName('li');
+	for (var i = 0; i < bullets.length; i++) {
+		var anchor = bullets[i].getElementsByTagName("a")[0];		
+		if (anchor.hasAttribute("class")) {
+			document.getElementById("sampleName").innerHTML = anchor.innerHTML;
+			handleSampleSelect(anchor.innerHTML + ".txt");
+			break;
+		}
+	}
+});
+
+function onLocalClick() {
+	document.getElementById("files").disabled = false;
+}
+
+function onSampleClick() {
+	document.getElementById("files").disabled = true;
+
+	document.getElementById("sample").style.display = "inline";
+	document.getElementById("sampleClose").style.display = "inline";
+}
+
+/**
+ * Callback function when the user checks or unchecks the time trial checkbox.
+ */
+function toggleTimeTrial() {
+	// if it's not a time trial, disable the time limit input field
+	document.getElementById("time").disabled = !document.getElementById("timeCheckbox").checked;
+}
+
+var enableKeyboard = true;
+
+function showKeyboard() {
+	enableKeyboard = !enableKeyboard;
+
+	if (enableKeyboard) {
+		document.getElementById("canvas").style.display = "inline";
+	} else {
+		document.getElementById("canvas").style.display = "none";
+	}
+}
+</script>
+
+</body>
+</html>
