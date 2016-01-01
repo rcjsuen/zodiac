@@ -12,9 +12,27 @@ var files = null;
 var fileCounter = 0;
 var wordCounter = 0;
 
+/**
+ * The name of the sample file that's been selected. Will be null if
+ * the user has chosen to use a local file.
+ */
+var sampleFileName = null;
+
 var front = true;
 
 function handleSampleSelect(fileName) {
+	sampleFileName = fileName;
+	files = null;
+	readSample(false);
+}
+
+/**
+ * Read the sample file and prompt its contents as a flashcard.	
+ * 
+ * @param restart true if this run was prompted by a restart, false
+ * otherwise
+ */
+function readSample(restart) {
 	var xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function() {
 		if (xhttp.readyState === 4 && xhttp.status === 200) {
@@ -37,19 +55,38 @@ function handleSampleSelect(fileName) {
 	
 			document.getElementById("startBtn").disabled = false;
 			document.getElementById("nextBtn").disabled = false;
+			document.getElementById("restartBtn").disabled = false;
+			
+			if (restart) {
+				document.getElementById("report").style.display = "none";
+				document.getElementById("input").value = "";
+				startCountdown();
+			}
 			show();
 		}
 	};
-	xhttp.open("GET", "words/" + fileName, true);
+	xhttp.open("GET", "words/" + sampleFileName, true);
 	xhttp.send();
 }
 
 function handleFileSelect(e) {
+	files = e.target.files;
+	sampleFileName = null;
+	readFiles(false);
+}
+
+/**
+ * Reads the files that the user has selected locally and prompts them
+ * as flashcards.
+ * 
+ * @param restart true if this run was prompted by a restart, false
+ * otherwise
+ */
+function readFiles(restart) {
 	wordCounter = 0;
 	fileCounter = 0;
 	english = [];
 	japanese = [];
-	files = e.target.files;
 	var reader = new FileReader();
 	
 	reader.onload = function(e) {
@@ -68,8 +105,15 @@ function handleFileSelect(e) {
 		if (fileCounter !== files.length) {
 			reader.readAsText(files[fileCounter], "UTF-8");
 		} else {
+			document.getElementById("restartBtn").disabled = false;
 			document.getElementById("startBtn").disabled = false;
 			document.getElementById("nextBtn").disabled = false;
+			
+			if (restart) {
+				document.getElementById("report").style.display = "none";
+				document.getElementById("input").value = "";
+				startCountdown();
+			}
 			show();
 		}
 	};
@@ -142,6 +186,8 @@ var timeLimit = -1;
  */
 var startTime = -1;
 
+var start = -1;
+
 function startCountdown() {
 	// hide the setup popup
 	document.getElementById("openModal").style.display = "none";
@@ -149,6 +195,7 @@ function startCountdown() {
 	if (document.getElementById("timeCheckbox").checked) {
 		// show the timer
 		document.getElementById("countdown").style.display = "inline";
+		start = new Date().getTime();
 		drawCountdownCanvas();
 	} else {
 		// not a time trial, remove the trial timer
@@ -189,7 +236,18 @@ function showReport() {
 	}
 	document.getElementById("body").style.background = "#333333";
 	document.getElementById("content").style.display = "none";
+	document.getElementById("restartBtn").disabled = false;
 	document.getElementById("report").style.display = "inline";
+}
+
+function restart() {
+	document.getElementById("restartBtn").disabled = true;
+	
+	if (files === null) {
+		readSample(true);
+	} else {
+		readFiles(true);
+	}
 }
 
 function startTimeTrial() {
@@ -220,12 +278,7 @@ var canvas = document.getElementById("countdownCanvas");
 var ctx = canvas.getContext("2d");
 var startPoint = 0 - (Math.PI / 2);
 
-var start = -1;
-
 function drawCountdownCanvas() {
-	if (start === -1) {
-		start = new Date().getTime();
-	}
 	var now = new Date().getTime();
 	if (now - start >= countdownTime * 1000) {
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
