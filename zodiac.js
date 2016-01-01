@@ -258,6 +258,11 @@ function startTimeTrial() {
 }
 
 function timer() {
+	// stop counting down on the timer if we're done
+	if (remaining === 0) {
+		return;
+	}
+	
 	remainingTime--;
 	if (remainingTime === 0) {
 		showReport();
