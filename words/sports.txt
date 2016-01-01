@@ -1,0 +1,16 @@
+soccer
+サッカー
+basketball
+バスケットボール
+volleyball
+バレーボール
+rugby
+ラグビー
+badminton
+バドミントン
+tennis
+テニス
+baseball
+野球
+softball
+ソフトボール
