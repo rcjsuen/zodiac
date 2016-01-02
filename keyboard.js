@@ -161,6 +161,8 @@ function keyUpHandler(e) {
 				if (keyboard[i][j] === key) {
 					keyDown[i][j] = false;
 					requestAnimationFrame(drawKeyboard);
+					
+					onCharacter(shiftDown ? key.toUpperCase() : key);
 					return;
 				}
 			}

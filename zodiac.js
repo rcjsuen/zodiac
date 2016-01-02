@@ -1,6 +1,9 @@
 /*eslint-env browser */
 const ASCII_ENTER = 13;
 
+const TYPE_FLASHCARD = 0;
+const TYPE_ALPHABET = TYPE_FLASHCARD + 1;
+
 var english = null;
 var japanese = null;
 
@@ -12,9 +15,28 @@ var files = null;
 var fileCounter = 0;
 var wordCounter = 0;
 
+/**
+ * The name of the sample file that's been selected. Will be null if
+ * the user has chosen to use a local file.
+ */
+var sampleFileName = null;
+
 var front = true;
 
 function handleSampleSelect(fileName) {
+	sampleFileName = fileName;
+	files = null;
+	readSample(false);
+}
+
+/**
+ * Read the sample file and prompt its contents as a flashcard.	
+ * 
+ * @param restart true if this run was prompted by a restart, false
+ * otherwise
+ */
+function readSample(restart) {
+	type = getType();
 	var xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function() {
 		if (xhttp.readyState === 4 && xhttp.status === 200) {
@@ -37,19 +59,39 @@ function handleSampleSelect(fileName) {
 	
 			document.getElementById("startBtn").disabled = false;
 			document.getElementById("nextBtn").disabled = false;
+			document.getElementById("restartBtn").disabled = false;
+			
+			if (restart) {
+				document.getElementById("report").style.display = "none";
+				document.getElementById("input").value = "";
+				startCountdown();
+			}
 			show();
 		}
 	};
-	xhttp.open("GET", "words/" + fileName, true);
+	xhttp.open("GET", "words/" + sampleFileName, true);
 	xhttp.send();
 }
 
 function handleFileSelect(e) {
+	files = e.target.files;
+	sampleFileName = null;
+	readFiles(false);
+}
+
+/**
+ * Reads the files that the user has selected locally and prompts them
+ * as flashcards.
+ * 
+ * @param restart true if this run was prompted by a restart, false
+ * otherwise
+ */
+function readFiles(restart) {
+	type = getType();
 	wordCounter = 0;
 	fileCounter = 0;
 	english = [];
 	japanese = [];
-	files = e.target.files;
 	var reader = new FileReader();
 	
 	reader.onload = function(e) {
@@ -68,8 +110,15 @@ function handleFileSelect(e) {
 		if (fileCounter !== files.length) {
 			reader.readAsText(files[fileCounter], "UTF-8");
 		} else {
+			document.getElementById("restartBtn").disabled = false;
 			document.getElementById("startBtn").disabled = false;
 			document.getElementById("nextBtn").disabled = false;
+			
+			if (restart) {
+				document.getElementById("report").style.display = "none";
+				document.getElementById("input").value = "";
+				startCountdown();
+			}
 			show();
 		}
 	};
@@ -95,16 +144,25 @@ function show() {
 	idx = Math.floor(Math.random() * remaining);
 	updateFlashCard();
 	document.getElementById("remaining").innerHTML = "残り： " + remaining + "/" + wordCounter;
-	document.getElementById("input").value = "";
+	
+	if (type === TYPE_FLASHCARD) {
+		document.getElementById("input").value = "";
+	} else if (type === TYPE_ALPHABET) {
+		var skipIdx = Math.floor(Math.random() * english[idx].length);
+		var display = "";
+		for (var i = 0; i < english[idx].length; i++) {
+			if (i === skipIdx) {
+				display = display + "_";
+			} else {
+				display = display + english[idx].charAt(i);
+			}
+		}
+		document.getElementById("alphabetsDisplay").innerHTML = display;
+	}
 }
 
-function onClick() {
-	var input = document.getElementById("input");
-	if (input.disabled) {
-		return;
-	}
-
-	if (input.value === english[idx]) {
+function next(answer) {
+	if (answer === english[idx]) {
 		remaining--;
 		english[idx] = english[remaining];
 		japanese[idx] = japanese[remaining];
@@ -129,6 +187,28 @@ function onClick() {
 	}
 }
 
+function onClick() {
+	var input = document.getElementById("input");
+	if (input.disabled) {
+		return;
+	}
+	next(input.value);
+}
+
+function onCharacter(c) {
+	if (type === TYPE_ALPHABET) {
+		var input = document.getElementById("input");
+		if (input.disabled) {
+			return;
+		}
+	
+		var string = document.getElementById("alphabetsDisplay").innerHTML;
+		var cIdx = string.indexOf("_");
+		next(string.substring(0, cIdx) + c + string.substring(cIdx + 1));
+	}
+}
+
+
 var countdownTime = 5;
 var remainingTime = -1;
 
@@ -142,13 +222,42 @@ var timeLimit = -1;
  */
 var startTime = -1;
 
+var start = -1;
+
+var type = -1;
+
+function getType() {
+	var navbar = document.getElementById('navbar').getElementsByTagName('li');
+	for (var i = 0; i < navbar.length; i ++) {
+		var anchor = navbar[i].getElementsByTagName("a")[0];
+		if (anchor.hasAttribute("class")) {
+			var id = anchor.getAttribute("id");
+			if (id === "flashcard") {
+				return TYPE_FLASHCARD;
+			} else if (id === "alphabet") {
+				return TYPE_ALPHABET;
+			}
+			throw "Unknown type: " + id;
+		}
+	}
+	
+	throw "No types found";
+}
+
 function startCountdown() {
 	// hide the setup popup
 	document.getElementById("openModal").style.display = "none";
-
+	
+	if (type === TYPE_ALPHABET) {
+		document.getElementById("nextBtn").style = "display: none;";
+		document.getElementById("input").style = "display: none;";
+		document.getElementById("alphabetsDisplay").style = "display: inline;";
+	}
+	
 	if (document.getElementById("timeCheckbox").checked) {
 		// show the timer
 		document.getElementById("countdown").style.display = "inline";
+		start = new Date().getTime();
 		drawCountdownCanvas();
 	} else {
 		// not a time trial, remove the trial timer
@@ -189,7 +298,18 @@ function showReport() {
 	}
 	document.getElementById("body").style.background = "#333333";
 	document.getElementById("content").style.display = "none";
+	document.getElementById("restartBtn").disabled = false;
 	document.getElementById("report").style.display = "inline";
+}
+
+function restart() {
+	document.getElementById("restartBtn").disabled = true;
+	
+	if (files === null) {
+		readSample(true);
+	} else {
+		readFiles(true);
+	}
 }
 
 function startTimeTrial() {
@@ -200,6 +320,11 @@ function startTimeTrial() {
 }
 
 function timer() {
+	// stop counting down on the timer if we're done
+	if (remaining === 0) {
+		return;
+	}
+	
 	remainingTime--;
 	if (remainingTime === 0) {
 		showReport();
@@ -220,12 +345,7 @@ var canvas = document.getElementById("countdownCanvas");
 var ctx = canvas.getContext("2d");
 var startPoint = 0 - (Math.PI / 2);
 
-var start = -1;
-
 function drawCountdownCanvas() {
-	if (start === -1) {
-		start = new Date().getTime();
-	}
 	var now = new Date().getTime();
 	if (now - start >= countdownTime * 1000) {
 		ctx.clearRect(0, 0, canvas.width, canvas.height);

@@ -9,6 +9,32 @@
 	    
 	    canvas { display: block; margin: 0 auto; }
 	    
+		ul {
+			padding: 0;
+			height: 100%;
+			margin-top: 0;
+			margin-left: 0;
+			list-style-type: none;
+			background-color: #3b4b54;
+		}
+		
+		li a {
+			cursor: pointer;
+			padding: 8px;
+			display: block;
+			color: #ffffff;
+			font-size: 16px;
+			font-family: Calibri, Arial, Helvetica, Bitstream Sans, sans-serif;
+		}
+		
+		li .active {
+			background-color: #1bb199;
+		}
+		
+		li a:hover:not(.active) {
+			background-color: #1bb1ee;
+		}
+	    
 	    .setup {
 	    	font-family: Calibri, Arial, Helvetica, Bitstream Sans, sans-serif;
 			position: absolute;
@@ -24,6 +50,12 @@
 			padding: 20px;
 			border-radius: 10px;
 			background-image: linear-gradient(120deg, #fff, #bbb)
+		}
+		
+		.preview > div {
+			font-family: Calibri, Arial, Helvetica, Bitstream Sans, sans-serif;
+			font-size: 20px;
+			margin-left: 1%;
 		}
 
 		.countdown {
@@ -102,6 +134,7 @@
 		}
 		
 		.input {
+	    	font-family: Calibri, Arial, Helvetica, Bitstream Sans, sans-serif;
 			font-size: 30px;
 			text-align: center;
 		}
@@ -164,6 +197,7 @@
 
 <input id="input" class="input" type="text" disabled/>
 <button id="nextBtn" class="input" type="button" onClick="onClick()" disabled>次へ</button>
+<p id="alphabetsDisplay" class="input" style="display: none;"></p>
 <p/>
 
 <canvas id="canvas" width=710" height="290"></canvas>
@@ -176,9 +210,23 @@
 
 <div id="openModal" class="setup">
 	<div>
+		<center>
+		<div>
 		<img src="images/logo.png"/><p/>
-		<p align="right">© 2015 Remy Suen</p>
+		<p align="center">© 2015 Remy Suen</p>
 		<hr/>
+		</div>
+		</center>
+		
+		<table border="0" cellspacing="0" cellpadding="0" height="100%">
+		<tr>
+		<td valign="top">
+		<ul id="navbar">
+			<li><a id="flashcard" class="active">フラッシュカード</a></li>
+			<li><a id="alphabet">アルファベット抜け</a></li>
+		</ul>
+		</td>
+		<td bgcolor="#ffffff">
 		<input type="radio" id="local" label="Local File" name="file" onClick="onLocalClick()" checked="true">ローカル　ファイル</input>
 		<input type="file" id="files" multiple/>
 		<p>
@@ -187,8 +235,11 @@
 		</p>
 		<p/>
 		<input type="checkbox" id="timeCheckbox" onClick="toggleTimeTrial()">時間制限</input>
-		<input type="number" id="time" disabled/><p/>
+		<input type="number" id="time" min="1" disabled/><p/>
 		<input type="checkbox" state="true" id="keyboardChk" checked="true" onClick="showKeyboard()">バーチャルキーボード</input><p/>
+		</td>
+		</tr>
+		</table>
 		<p align="center"><button id="startBtn" type="button" onClick="startCountdown()" disabled>スタート</button></p>
 	</div>
 </div>
@@ -202,6 +253,7 @@
 		<p id="reportTimeLimit" class="report"></p>
 		<p id="reportRemainingTime" class="report"></p>
 		<p id="reportRemainingCards" class="report"></p>
+		<p align="center"><button id="restartBtn" type="button" onClick="restart()" disabled>もう一回</button></p>
 	</div>
 </div>
 
@@ -214,6 +266,27 @@
 <script src="keyboard.js"></script>
 <script src="zodiac.js"></script>
 <script>
+function hookNavbar() {
+	var navbar = document.getElementById('navbar').getElementsByTagName('li');
+	for (var i = 0; i < navbar.length; i++) {
+		navbar[i].addEventListener('click', function(e) {
+			onNav(e);
+		},false);
+	}	
+}
+hookNavbar();
+
+function onNav(e) {
+	var navbar = document.getElementById('navbar').getElementsByTagName('li');
+	var anchor = e.currentTarget.getElementsByTagName("a")[0];
+	if (!anchor.hasAttribute("class")) {
+		for (i = 0; i < navbar.length; i++) {
+			navbar[i].getElementsByTagName("a")[0].removeAttribute("class");
+		}
+		anchor.setAttribute("class", "active");
+	}
+}
+
 document.getElementById("local").setAttribute("checked", true);
 
 document.getElementById("sampleClose").addEventListener("click", function() {
