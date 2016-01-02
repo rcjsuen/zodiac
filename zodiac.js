@@ -1,6 +1,9 @@
 /*eslint-env browser */
 const ASCII_ENTER = 13;
 
+const TYPE_FLASHCARD = 0;
+const TYPE_ALPHABET = TYPE_FLASHCARD + 1;
+
 var english = null;
 var japanese = null;
 
@@ -33,6 +36,7 @@ function handleSampleSelect(fileName) {
  * otherwise
  */
 function readSample(restart) {
+	type = getType();
 	var xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function() {
 		if (xhttp.readyState === 4 && xhttp.status === 200) {
@@ -83,6 +87,7 @@ function handleFileSelect(e) {
  * otherwise
  */
 function readFiles(restart) {
+	type = getType();
 	wordCounter = 0;
 	fileCounter = 0;
 	english = [];
@@ -139,16 +144,25 @@ function show() {
 	idx = Math.floor(Math.random() * remaining);
 	updateFlashCard();
 	document.getElementById("remaining").innerHTML = "残り： " + remaining + "/" + wordCounter;
-	document.getElementById("input").value = "";
+	
+	if (type === TYPE_FLASHCARD) {
+		document.getElementById("input").value = "";
+	} else if (type === TYPE_ALPHABET) {
+		var skipIdx = Math.floor(Math.random() * english[idx].length);
+		var display = "";
+		for (var i = 0; i < english[idx].length; i++) {
+			if (i === skipIdx) {
+				display = display + "_";
+			} else {
+				display = display + english[idx].charAt(i);
+			}
+		}
+		document.getElementById("alphabetsDisplay").innerHTML = display;
+	}
 }
 
-function onClick() {
-	var input = document.getElementById("input");
-	if (input.disabled) {
-		return;
-	}
-
-	if (input.value === english[idx]) {
+function next(answer) {
+	if (answer === english[idx]) {
 		remaining--;
 		english[idx] = english[remaining];
 		japanese[idx] = japanese[remaining];
@@ -173,6 +187,28 @@ function onClick() {
 	}
 }
 
+function onClick() {
+	var input = document.getElementById("input");
+	if (input.disabled) {
+		return;
+	}
+	next(input.value);
+}
+
+function onCharacter(c) {
+	if (type === TYPE_ALPHABET) {
+		var input = document.getElementById("input");
+		if (input.disabled) {
+			return;
+		}
+	
+		var string = document.getElementById("alphabetsDisplay").innerHTML;
+		var cIdx = string.indexOf("_");
+		next(string.substring(0, cIdx) + c + string.substring(cIdx + 1));
+	}
+}
+
+
 var countdownTime = 5;
 var remainingTime = -1;
 
@@ -188,10 +224,36 @@ var startTime = -1;
 
 var start = -1;
 
+var type = -1;
+
+function getType() {
+	var navbar = document.getElementById('navbar').getElementsByTagName('li');
+	for (var i = 0; i < navbar.length; i ++) {
+		var anchor = navbar[i].getElementsByTagName("a")[0];
+		if (anchor.hasAttribute("class")) {
+			var id = anchor.getAttribute("id");
+			if (id === "flashcard") {
+				return TYPE_FLASHCARD;
+			} else if (id === "alphabet") {
+				return TYPE_ALPHABET;
+			}
+			throw "Unknown type: " + id;
+		}
+	}
+	
+	throw "No types found";
+}
+
 function startCountdown() {
 	// hide the setup popup
 	document.getElementById("openModal").style.display = "none";
-
+	
+	if (type === TYPE_ALPHABET) {
+		document.getElementById("nextBtn").style = "display: none;";
+		document.getElementById("input").style = "display: none;";
+		document.getElementById("alphabetsDisplay").style = "display: inline;";
+	}
+	
 	if (document.getElementById("timeCheckbox").checked) {
 		// show the timer
 		document.getElementById("countdown").style.display = "inline";
