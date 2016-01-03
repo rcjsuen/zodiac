@@ -1,8 +1,20 @@
 /*eslint-env browser */
 const ASCII_ENTER = 13;
 
+/**
+ * The user will enter in the English word of the corresponding flashcard.
+ */
 const TYPE_FLASHCARD = 0;
+
+/**
+ * The user will fill in one missing character from the English word(s).
+ */
 const TYPE_ALPHABET = TYPE_FLASHCARD + 1;
+
+/**
+ * The user will simply read the answer.
+ */
+const TYPE_READING = TYPE_ALPHABET + 1;
 
 var english = null;
 var japanese = null;
@@ -36,7 +48,6 @@ function handleSampleSelect(fileName) {
  * otherwise
  */
 function readSample(restart) {
-	type = getType();
 	var xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function() {
 		if (xhttp.readyState === 4 && xhttp.status === 200) {
@@ -66,7 +77,6 @@ function readSample(restart) {
 				document.getElementById("input").value = "";
 				startCountdown();
 			}
-			show();
 		}
 	};
 	xhttp.open("GET", "words/" + sampleFileName, true);
@@ -87,7 +97,6 @@ function handleFileSelect(e) {
  * otherwise
  */
 function readFiles(restart) {
-	type = getType();
 	wordCounter = 0;
 	fileCounter = 0;
 	english = [];
@@ -119,7 +128,6 @@ function readFiles(restart) {
 				document.getElementById("input").value = "";
 				startCountdown();
 			}
-			show();
 		}
 	};
 
@@ -128,15 +136,23 @@ function readFiles(restart) {
 
 document.getElementById('files').addEventListener('change', handleFileSelect, false);
 
+function getText() {
+	if (type === TYPE_READING && document.getElementById("readingEnglish").checked) {
+		return english[idx];
+	}
+	return japanese[idx];
+}
+
 function updateFlashCard() {
+	var text = getText();
 	if (front) {
-		document.getElementById("frontContent").innerHTML = japanese[idx];
+		document.getElementById("frontContent").innerHTML = text;
 		document.getElementById("frontTable").style.visibility = "visible";
 		document.getElementById("backTable").style.visibility = "hidden";
 	} else {
 		document.getElementById("frontTable").style.visibility = "hidden";
 		document.getElementById("backTable").style.visibility = "visible";
-		document.getElementById("backContent").innerHTML = japanese[idx];
+		document.getElementById("backContent").innerHTML = text;
 	}
 }
 
@@ -162,7 +178,8 @@ function show() {
 }
 
 function next(answer) {
-	if (answer === english[idx]) {
+	// check if the answer matches, or if we're just doing a read through
+	if (answer === english[idx] || type === TYPE_READING) {
 		remaining--;
 		english[idx] = english[remaining];
 		japanese[idx] = japanese[remaining];
@@ -236,6 +253,8 @@ function getType() {
 				return TYPE_FLASHCARD;
 			} else if (id === "alphabet") {
 				return TYPE_ALPHABET;
+			} else if (id === "reading") {
+				return TYPE_READING;
 			}
 			throw "Unknown type: " + id;
 		}
@@ -245,13 +264,23 @@ function getType() {
 }
 
 function startCountdown() {
+	type = getType();
+	show();
 	// hide the setup popup
 	document.getElementById("openModal").style.display = "none";
 	
-	if (type === TYPE_ALPHABET) {
-		document.getElementById("nextBtn").style = "display: none;";
-		document.getElementById("input").style = "display: none;";
-		document.getElementById("alphabetsDisplay").style = "display: inline;";
+	updateFlashCard();
+	
+	switch (type) {
+		case TYPE_ALPHABET:
+			document.getElementById("nextBtn").style = "display: none;";
+			document.getElementById("input").style = "display: none;";
+			document.getElementById("alphabetsDisplay").style = "display: inline;";
+			break;
+		case TYPE_READING:
+			document.getElementById("input").style = "display: none;";
+			document.getElementById("canvas").style.display = "none";
+			break;
 	}
 	
 	if (document.getElementById("timeCheckbox").checked) {
