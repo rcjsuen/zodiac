@@ -28,6 +28,7 @@
 		}
 		
 		li .active {
+			color: #000000;
 			background-color: #1bb199;
 		}
 		
@@ -213,20 +214,11 @@
 		<center>
 		<div>
 		<img src="images/logo.png"/><p/>
-		<p align="center">© 2015 Remy Suen</p>
+		<p align="right">© 2015 Remy Suen</p>
 		<hr/>
 		</div>
 		</center>
 		
-		<table border="0" cellspacing="0" cellpadding="0" height="100%">
-		<tr>
-		<td valign="top">
-		<ul id="navbar">
-			<li><a id="flashcard" class="active">フラッシュカード</a></li>
-			<li><a id="alphabet">アルファベット抜け</a></li>
-		</ul>
-		</td>
-		<td bgcolor="#ffffff">
 		<input type="radio" id="local" label="Local File" name="file" onClick="onLocalClick()" checked="true">ローカル　ファイル</input>
 		<input type="file" id="files" multiple/>
 		<p>
@@ -236,7 +228,22 @@
 		<p/>
 		<input type="checkbox" id="timeCheckbox" onClick="toggleTimeTrial()">時間制限</input>
 		<input type="number" id="time" min="1" disabled/><p/>
-		<input type="checkbox" state="true" id="keyboardChk" checked="true" onClick="showKeyboard()">バーチャルキーボード</input><p/>
+		
+		<table border="0" cellspacing="0" cellpadding="0" height="100%" width="100%">
+		<tr>
+		<td valign="top" width="40%">
+		<ul id="navbar">
+			<li><a id="flashcard" class="active">フラッシュカード</a></li>
+			<li><a id="alphabet">アルファベット抜け</a></li>
+			<li><a id="reading">読む練習</a></li>
+		</ul>
+		</td>
+		<td valign="top" bgcolor="#ffffff" style="padding: 2" width="60%">
+		<p id="keyboardOptions"><input type="checkbox" state="true" checked="true" onClick="showKeyboard()">バーチャルキーボード</input></p>
+		<p id="readingOptions" style="display: none;">カードの言語:<br/>
+		<input type="radio" id="readingEnglish" name="readingLanguage" checked="true">英語</input><br/>
+		<input type="radio" name="readingLanguage">日本語</input><br/>
+		</p>
 		</td>
 		</tr>
 		</table>
@@ -284,6 +291,16 @@ function onNav(e) {
 			navbar[i].getElementsByTagName("a")[0].removeAttribute("class");
 		}
 		anchor.setAttribute("class", "active");
+		
+		var id = anchor.getAttribute("id");
+		
+		if (id === "flashcard" || id === "alphabet") {
+			document.getElementById("keyboardOptions").style.display = "inline";
+			document.getElementById("readingOptions").style.display = "none";
+		} else if (id === "reading") {
+			document.getElementById("keyboardOptions").style.display = "none";
+			document.getElementById("readingOptions").style.display = "inline";
+		}
 	}
 }
 
