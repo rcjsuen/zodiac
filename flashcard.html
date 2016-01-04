@@ -195,9 +195,20 @@
     </div>
 </div>
 
-<input id="input" class="input" type="text" disabled/>
-<button id="nextBtn" class="input" type="button" onClick="onClick()" disabled>次へ</button>
-<p id="alphabetsDisplay" class="input" style="display: none;"></p>
+<p id="flashcardContent">
+<input id="input"  class="input" type="text" disabled/>
+<button type="button" class="input" onClick="onClick()">次へ</button>
+</p>
+
+<p id="alphabetsContent" class="input" style="display: none;">
+<span id="alphabetsDisplay" class="input"></span>
+</p>
+
+<p id="readingContent" class="input" style="display: none;">
+<span id="readingDisplay" class="input"></span>
+<br/><br/>
+<button class="input" type="button" onClick="onClick()">次へ</button>
+<button class="input" type="button" onClick="onShow()">答えを示す</button>
 <p/>
 
 <canvas id="canvas" width=710" height="290"></canvas>

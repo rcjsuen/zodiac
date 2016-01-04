@@ -69,7 +69,6 @@ function readSample(restart) {
 			fileCounter++;
 	
 			document.getElementById("startBtn").disabled = false;
-			document.getElementById("nextBtn").disabled = false;
 			document.getElementById("restartBtn").disabled = false;
 			
 			if (restart) {
@@ -121,7 +120,6 @@ function readFiles(restart) {
 		} else {
 			document.getElementById("restartBtn").disabled = false;
 			document.getElementById("startBtn").disabled = false;
-			document.getElementById("nextBtn").disabled = false;
 			
 			if (restart) {
 				document.getElementById("report").style.display = "none";
@@ -141,6 +139,10 @@ function getText() {
 		return english[idx];
 	}
 	return japanese[idx];
+}
+
+function getAnswer() {
+	return document.getElementById("readingEnglish").checked ? japanese[idx] : english[idx];
 }
 
 function updateFlashCard() {
@@ -225,6 +227,11 @@ function onCharacter(c) {
 	}
 }
 
+function onShow() {
+	if (type === TYPE_READING) {
+		document.getElementById("readingDisplay").innerHTML = getAnswer();
+	}
+}
 
 var countdownTime = 5;
 var remainingTime = -1;
@@ -273,12 +280,12 @@ function startCountdown() {
 	
 	switch (type) {
 		case TYPE_ALPHABET:
-			document.getElementById("nextBtn").style = "display: none;";
-			document.getElementById("input").style = "display: none;";
-			document.getElementById("alphabetsDisplay").style = "display: inline;";
+			document.getElementById("flashcardContent").style = "display: none;";
+			document.getElementById("alphabetsContent").style = "display: inline;";
 			break;
 		case TYPE_READING:
-			document.getElementById("input").style = "display: none;";
+			document.getElementById("flashcardContent").style = "display: none;";
+			document.getElementById("readingContent").style = "display: inline;";
 			document.getElementById("canvas").style.display = "none";
 			break;
 	}
@@ -307,7 +314,6 @@ function showReport() {
 	
 	document.getElementById("backContent").innerHTML = "";
 	document.getElementById("frontContent").innerHTML = "";
-	document.getElementById("nextBtn").disabled = true;
 	document.getElementById("input").disabled = true;
 	
 	if (remainingTime === -1) {
