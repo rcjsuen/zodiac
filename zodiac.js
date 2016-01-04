@@ -16,15 +16,41 @@ const TYPE_ALPHABET = TYPE_FLASHCARD + 1;
  */
 const TYPE_READING = TYPE_ALPHABET + 1;
 
+/**
+ * The type of flashcard run that has been selected.TYPE_READING
+ * 
+ * @see TYPE_FLASHCARD
+ * @see TYPE_ALPHABET
+ * @see TYPE_READING
+ */
+var type = -1;
+
+/**
+ * The array of English words on the flashcards.
+ * 
+ * @see japanese
+ */
 var english = null;
+
+/**
+ * The array of Japanese words on the flashcards.
+ * 
+ * @see english
+ */
 var japanese = null;
 
-var count = -1;
+/**
+ * The number of cards that are left in the deck.
+ */
 var remaining = -1;
 var idx = -1;
 
 var files = null;
 var fileCounter = 0;
+
+/**
+ * The total number of cards in the deck.
+ */
 var wordCounter = 0;
 
 /**
@@ -63,8 +89,7 @@ function readSample(restart) {
 				japanese[wordCounter] = strings[(i * 2) + 1].trim();
 				wordCounter++;
 			}
-			count = english.length;
-			remaining = count;
+			remaining = english.length;
 	
 			fileCounter++;
 	
@@ -110,8 +135,7 @@ function readFiles(restart) {
 			japanese[wordCounter] = strings[(i * 2) + 1].trim();
 			wordCounter++;
 		}
-		count = english.length;
-		remaining = count;
+		remaining = english.length;
 
 		fileCounter++;
 
@@ -255,8 +279,6 @@ var timeLimit = -1;
 var startTime = -1;
 
 var start = -1;
-
-var type = -1;
 
 function getType() {
 	var navbar = document.getElementById('navbar').getElementsByTagName('li');
