@@ -186,7 +186,15 @@ function next(answer) {
 		english[idx] = english[remaining];
 		japanese[idx] = japanese[remaining];
 
-		document.getElementById("mistake").innerHTML = "";
+		switch (type) {
+			case TYPE_FLASHCARD:
+			case TYPE_ALPHABET:
+				document.getElementById("mistake").innerHTML = "";
+				break;
+			case TYPE_READING:
+				document.getElementById("readingDisplay").innerHTML = "";
+				break;
+		}
 
 		if (remaining === 0) {
 			showReport();
