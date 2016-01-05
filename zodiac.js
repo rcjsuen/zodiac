@@ -16,15 +16,41 @@ const TYPE_ALPHABET = TYPE_FLASHCARD + 1;
  */
 const TYPE_READING = TYPE_ALPHABET + 1;
 
+/**
+ * The type of flashcard run that has been selected.TYPE_READING
+ * 
+ * @see TYPE_FLASHCARD
+ * @see TYPE_ALPHABET
+ * @see TYPE_READING
+ */
+var type = -1;
+
+/**
+ * The array of English words on the flashcards.
+ * 
+ * @see japanese
+ */
 var english = null;
+
+/**
+ * The array of Japanese words on the flashcards.
+ * 
+ * @see english
+ */
 var japanese = null;
 
-var count = -1;
+/**
+ * The number of cards that are left in the deck.
+ */
 var remaining = -1;
 var idx = -1;
 
 var files = null;
 var fileCounter = 0;
+
+/**
+ * The total number of cards in the deck.
+ */
 var wordCounter = 0;
 
 /**
@@ -63,13 +89,11 @@ function readSample(restart) {
 				japanese[wordCounter] = strings[(i * 2) + 1].trim();
 				wordCounter++;
 			}
-			count = english.length;
-			remaining = count;
+			remaining = english.length;
 	
 			fileCounter++;
 	
 			document.getElementById("startBtn").disabled = false;
-			document.getElementById("nextBtn").disabled = false;
 			document.getElementById("restartBtn").disabled = false;
 			
 			if (restart) {
@@ -111,8 +135,7 @@ function readFiles(restart) {
 			japanese[wordCounter] = strings[(i * 2) + 1].trim();
 			wordCounter++;
 		}
-		count = english.length;
-		remaining = count;
+		remaining = english.length;
 
 		fileCounter++;
 
@@ -121,7 +144,6 @@ function readFiles(restart) {
 		} else {
 			document.getElementById("restartBtn").disabled = false;
 			document.getElementById("startBtn").disabled = false;
-			document.getElementById("nextBtn").disabled = false;
 			
 			if (restart) {
 				document.getElementById("report").style.display = "none";
@@ -141,6 +163,10 @@ function getText() {
 		return english[idx];
 	}
 	return japanese[idx];
+}
+
+function getAnswer() {
+	return document.getElementById("readingEnglish").checked ? japanese[idx] : english[idx];
 }
 
 function updateFlashCard() {
@@ -184,7 +210,15 @@ function next(answer) {
 		english[idx] = english[remaining];
 		japanese[idx] = japanese[remaining];
 
-		document.getElementById("mistake").innerHTML = "";
+		switch (type) {
+			case TYPE_FLASHCARD:
+			case TYPE_ALPHABET:
+				document.getElementById("mistake").innerHTML = "";
+				break;
+			case TYPE_READING:
+				document.getElementById("readingDisplay").innerHTML = "";
+				break;
+		}
 
 		if (remaining === 0) {
 			showReport();
@@ -225,6 +259,11 @@ function onCharacter(c) {
 	}
 }
 
+function onShow() {
+	if (type === TYPE_READING) {
+		document.getElementById("readingDisplay").innerHTML = getAnswer();
+	}
+}
 
 var countdownTime = 5;
 var remainingTime = -1;
@@ -240,8 +279,6 @@ var timeLimit = -1;
 var startTime = -1;
 
 var start = -1;
-
-var type = -1;
 
 function getType() {
 	var navbar = document.getElementById('navbar').getElementsByTagName('li');
@@ -273,12 +310,12 @@ function startCountdown() {
 	
 	switch (type) {
 		case TYPE_ALPHABET:
-			document.getElementById("nextBtn").style = "display: none;";
-			document.getElementById("input").style = "display: none;";
-			document.getElementById("alphabetsDisplay").style = "display: inline;";
+			document.getElementById("flashcardContent").style = "display: none;";
+			document.getElementById("alphabetsContent").style = "display: inline;";
 			break;
 		case TYPE_READING:
-			document.getElementById("input").style = "display: none;";
+			document.getElementById("flashcardContent").style = "display: none;";
+			document.getElementById("readingContent").style = "display: inline;";
 			document.getElementById("canvas").style.display = "none";
 			break;
 	}
@@ -307,7 +344,6 @@ function showReport() {
 	
 	document.getElementById("backContent").innerHTML = "";
 	document.getElementById("frontContent").innerHTML = "";
-	document.getElementById("nextBtn").disabled = true;
 	document.getElementById("input").disabled = true;
 	
 	if (remainingTime === -1) {
