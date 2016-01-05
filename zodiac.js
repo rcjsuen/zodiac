@@ -182,6 +182,15 @@ function updateFlashCard() {
 	}
 }
 
+/**
+ * Checks whether the given character code corresponds to an English character.
+ * 
+ * @param charCode the character code to check
+ */
+function isEnglishLetter(charCode) {
+	return (65 <= charCode && charCode <= 90) || (97 <= charCode && charCode <= 122);
+}
+
 function show() {
 	idx = Math.floor(Math.random() * remaining);
 	updateFlashCard();
@@ -191,6 +200,9 @@ function show() {
 		document.getElementById("input").value = "";
 	} else if (type === TYPE_ALPHABET) {
 		var skipIdx = Math.floor(Math.random() * english[idx].length);
+		while (!isEnglishLetter(english[idx].charCodeAt(skipIdx))) {
+			skipIdx = Math.floor(Math.random() * english[idx].length);
+		}
 		var display = "";
 		for (var i = 0; i < english[idx].length; i++) {
 			if (i === skipIdx) {
