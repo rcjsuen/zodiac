@@ -1,4 +1,5 @@
 /*eslint-env browser */
+const ASCII_BACKSPACE = 8;
 const ASCII_SHIFT = 16;
 const ASCII_SPACEBAR = 32;
 const ASCII_COMMA = 188;
@@ -182,6 +183,10 @@ function keyDownHandler(e) {
 	} else if (e.keyCode === ASCII_SPACEBAR) {
 		spaceDown = true;
 		requestAnimationFrame(drawKeyboard);
+	} else if (e.keyCode === ASCII_BACKSPACE) {
+		if (onBackspace()) {
+			e.preventDefault();
+		}
 	} else {
 		var key = getEventKey(e);
 		

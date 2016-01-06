@@ -61,6 +61,33 @@ var sampleFileName = null;
 
 var front = true;
 
+/**
+ * The number of characters to remove when the user is trying to fill in the blanks.
+ */
+var remove = -1;
+
+/**
+ * An array of indices of the characters that have been removed.
+ * 
+ * @see skipIdx
+ * @see fillIndices
+ */
+var skipIndices = null;
+
+/**
+ * The current index within the list of removed characters that the user is currently on.undefined
+ * 
+ * @see skipIndices
+ */
+var skipIdx = 0;
+
+/**
+ * An array of characters that the user has entered.
+ * 
+ * @see skipIndices
+ */
+var fillIndices = [];
+
 function handleSampleSelect(fileName) {
 	sampleFileName = fileName;
 	files = null;
@@ -191,6 +218,55 @@ function isEnglishLetter(charCode) {
 	return (65 <= charCode && charCode <= 90) || (97 <= charCode && charCode <= 122);
 }
 
+/**
+ * Retrieves an array of indices that are to be skipped given the number of characters to remove.
+ * 
+ * @param remove the number of characters to remove from the current English word
+ */
+function getSkippedIndices(remove) {
+	var indices = [];
+	var i = 0;
+	while (remove > 0) {
+		var randomIdx = Math.floor(Math.random() * english[idx].length);
+		while (!isEnglishLetter(english[idx].charCodeAt(randomIdx)) || indices.indexOf(randomIdx) !== -1) {
+			randomIdx = Math.floor(Math.random() * english[idx].length);
+		}
+		indices[i] = randomIdx;
+		i++;
+		remove--;
+	}
+	indices.sort();
+	return indices;
+}
+
+/**
+ * Returns the English word with a subset of its characters missing and replaced with an underscore.
+ */
+function getRemovalDisplayText() {
+	var display = "";
+	if (remove >= english[idx].length) {
+		// been asked to remove more than the number of characters in this word
+		for (var i = 0; i < english[idx].length; i++) {
+			display = display + "_";
+		}
+	} else {
+		skipIndices = getSkippedIndices(remove);
+		for (i = 0; i < skipIndices.length; i++) {
+			fillIndices[i] = -1;
+		}
+		var j = 0;
+		for (i = 0; i < english[idx].length; i++) {
+			if (i === skipIndices[j]) {
+				display = display + "_";
+				j++;
+			} else {
+				display = display + english[idx].charAt(i);
+			}
+		}
+	}
+	return display;
+}
+
 function show() {
 	idx = Math.floor(Math.random() * remaining);
 	updateFlashCard();
@@ -199,20 +275,17 @@ function show() {
 	if (type === TYPE_FLASHCARD) {
 		document.getElementById("input").value = "";
 	} else if (type === TYPE_ALPHABET) {
-		var skipIdx = Math.floor(Math.random() * english[idx].length);
-		while (!isEnglishLetter(english[idx].charCodeAt(skipIdx))) {
-			skipIdx = Math.floor(Math.random() * english[idx].length);
-		}
-		var display = "";
-		for (var i = 0; i < english[idx].length; i++) {
-			if (i === skipIdx) {
-				display = display + "_";
-			} else {
-				display = display + english[idx].charAt(i);
-			}
-		}
-		document.getElementById("alphabetsDisplay").innerHTML = display;
+		var text = getRemovalDisplayText();
+		document.getElementById("alphabetsDisplay").innerHTML = text;
+		document.getElementById("alphabetsInput").innerHTML = text;
 	}
+}
+
+/**
+ * Displays a text to the user indicating that there is a mistake in the answer.
+ */
+function showError() {
+	document.getElementById("mistake").innerHTML = "<font color=\"red\">間違った！</font>";
 }
 
 function next(answer) {
@@ -246,7 +319,7 @@ function next(answer) {
 			}
 		}
 	} else {
-		document.getElementById("mistake").innerHTML = "<font color=\"red\">間違った！</font>";
+		showError();
 	}
 }
 
@@ -258,16 +331,83 @@ function onClick() {
 	next(input.value);
 }
 
-function onCharacter(c) {
-	if (type === TYPE_ALPHABET) {
-		var input = document.getElementById("input");
-		if (input.disabled) {
-			return;
-		}
+/**
+ * Given the current index of where the user is in completing the English word,
+ * either fill in the character or remove the most recently filled in character.
+ * 
+ * @param c the character to enter in, or null if the most recently filled in
+ * character should be removed
+ */
+function fillInTheBlank(c) {
+	// has the user completed the word
+	var done = true;
+	// are there any errors
+	var hasErrors = false;
 	
-		var string = document.getElementById("alphabetsDisplay").innerHTML;
-		var cIdx = string.indexOf("_");
-		next(string.substring(0, cIdx) + c + string.substring(cIdx + 1));
+	if (c === null) {
+		// remove the last character
+		skipIdx--;
+		fillIndices[skipIdx] = -1;
+	} else {
+		// fill in the current character
+		fillIndices[skipIdx] = c;
+		skipIdx++;
+	}
+	
+	var html = "";
+	var j = 0;
+	for (var i = 0; i < english[idx].length; i++) {
+		var char = english[idx].charAt(i);
+		// is this an index that was skipped
+		if (i === skipIndices[j]) {
+			if (fillIndices[j] === char) {
+				// the character matches, make it green
+				html = html + "<font color=\"#00dd00\">" + fillIndices[j] + "</font>";
+			} else if (fillIndices[j] === -1) {
+				// this character hasn't been entered in yet, put in an underscore
+				html = html + "_";
+				done = false;
+			} else {
+				// the character is wrong, make it red
+				html = html + "<font color=\"#ff0000\">" + fillIndices[j] + "</font>";
+				done = false;
+				hasErrors = true;
+			}
+			j++;
+		} else {
+			html = html + char;
+		}
+	}
+	
+	if (done) {
+		// we're done, reset and move on
+		skipIdx = 0;
+		next(english[idx]);
+	} else {
+		// update the input
+		document.getElementById("alphabetsInput").innerHTML = html;
+		if (hasErrors) {
+			// show errors if there are any
+			showError();
+		} else {
+			// clear the error message otherwise
+			document.getElementById("mistake").innerHTML = "";
+		}
+	}
+}
+
+function onBackspace() {
+	if (type === TYPE_ALPHABET) {
+		fillInTheBlank(null);
+		return true;
+	}
+	return false;
+}
+
+function onCharacter(c) {
+	// if the user just keeps typing, don't bother processing the extra stuff
+	if (type === TYPE_ALPHABET && skipIdx < skipIndices.length) {
+		fillInTheBlank(c);
 	}
 }
 
@@ -314,14 +454,12 @@ function getType() {
 
 function startCountdown() {
 	type = getType();
-	show();
-	// hide the setup popup
-	document.getElementById("openModal").style.display = "none";
-	
-	updateFlashCard();
 	
 	switch (type) {
 		case TYPE_ALPHABET:
+			remove = parseInt(document.getElementById("alphabetRemoval").value, 10);
+			
+			document.getElementById("alphabetsInput").style = "display: inline;";
 			document.getElementById("flashcardContent").style = "display: none;";
 			document.getElementById("alphabetsContent").style = "display: inline;";
 			break;
@@ -331,6 +469,12 @@ function startCountdown() {
 			document.getElementById("canvas").style.display = "none";
 			break;
 	}
+	
+	show();
+	// hide the setup popup
+	document.getElementById("openModal").style.display = "none";
+	
+	updateFlashCard();
 	
 	if (document.getElementById("timeCheckbox").checked) {
 		// show the timer
