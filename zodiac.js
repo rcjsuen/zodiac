@@ -225,14 +225,32 @@ function isEnglishLetter(charCode) {
  */
 function getSkippedIndices(remove) {
 	var indices = [];
-	var i = 0;
+	var count = 0;
+	for (var i = 0; i < english[idx].length; i++) {
+		if (isEnglishLetter(english[idx].charCodeAt(i))) {
+			count++;
+		}			
+	}
+	
+	var j = 0;
+	if (count <= remove) {
+		// will be removing all the English characters
+		for (i = 0; i < english[idx].length; i++) {
+			if (isEnglishLetter(english[idx].charCodeAt(i))) {
+				indices[j] = i;
+				j++;
+			}			
+		}
+		return indices;
+	}
+	
 	while (remove > 0) {
 		var randomIdx = Math.floor(Math.random() * english[idx].length);
 		while (!isEnglishLetter(english[idx].charCodeAt(randomIdx)) || indices.indexOf(randomIdx) !== -1) {
 			randomIdx = Math.floor(Math.random() * english[idx].length);
 		}
-		indices[i] = randomIdx;
-		i++;
+		indices[j] = randomIdx;
+		j++;
 		remove--;
 	}
 	indices.sort();
@@ -244,24 +262,17 @@ function getSkippedIndices(remove) {
  */
 function getRemovalDisplayText() {
 	var display = "";
-	if (remove >= english[idx].length) {
-		// been asked to remove more than the number of characters in this word
-		for (var i = 0; i < english[idx].length; i++) {
+	skipIndices = getSkippedIndices(remove);
+	for (var i = 0; i < skipIndices.length; i++) {
+		fillIndices[i] = -1;
+	}
+	var j = 0;
+	for (i = 0; i < english[idx].length; i++) {
+		if (i === skipIndices[j]) {
 			display = display + "_";
-		}
-	} else {
-		skipIndices = getSkippedIndices(remove);
-		for (i = 0; i < skipIndices.length; i++) {
-			fillIndices[i] = -1;
-		}
-		var j = 0;
-		for (i = 0; i < english[idx].length; i++) {
-			if (i === skipIndices[j]) {
-				display = display + "_";
-				j++;
-			} else {
-				display = display + english[idx].charAt(i);
-			}
+			j++;
+		} else {
+			display = display + english[idx].charAt(i);
 		}
 	}
 	return display;
