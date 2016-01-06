@@ -459,13 +459,12 @@ function startCountdown() {
 		case TYPE_ALPHABET:
 			remove = parseInt(document.getElementById("alphabetRemoval").value, 10);
 			
-			document.getElementById("alphabetsInput").style = "display: inline;";
-			document.getElementById("flashcardContent").style = "display: none;";
-			document.getElementById("alphabetsContent").style = "display: inline;";
+			document.getElementById("flashcardContent").style.display = "none";
+			document.getElementById("alphabetsContent").style.display = "inline";
 			break;
 		case TYPE_READING:
-			document.getElementById("flashcardContent").style = "display: none;";
-			document.getElementById("readingContent").style = "display: inline;";
+			document.getElementById("flashcardContent").style.display = "none";
+			document.getElementById("readingContent").style.display = "inline";
 			document.getElementById("canvas").style.display = "none";
 			break;
 	}
