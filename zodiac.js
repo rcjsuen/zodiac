@@ -458,11 +458,11 @@ function getType() {
 			} else if (id === "reading") {
 				return TYPE_READING;
 			}
-			throw "Unknown type: " + id;
+			throw new Error("Unknown type: " + id);
 		}
 	}
 	
-	throw "No types found";
+	throw new Error("No types found");
 }
 
 function startCountdown() {
