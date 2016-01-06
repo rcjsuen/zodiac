@@ -398,7 +398,9 @@ function fillInTheBlank(c) {
 
 function onBackspace() {
 	if (type === TYPE_ALPHABET) {
-		fillInTheBlank(null);
+		if (skipIdx > 0) {
+			fillInTheBlank(null);
+		}
 		return true;
 	}
 	return false;
