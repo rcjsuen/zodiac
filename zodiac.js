@@ -522,11 +522,13 @@ function showReport() {
 	} else if (remainingTime > 0) {
 		// completed before the time trial ended, show the time used
 		document.getElementById("reportTimeLimit").innerHTML = "時間制限：" + timeLimit + "秒";
+		document.getElementById("reportRemainingTime").style.display = "inline";
 		document.getElementById("reportRemainingTime").innerHTML = "使った時間：" + (startTime / 1000) + "秒";
 		document.getElementById("reportRemainingCards").innerHTML = "カード枚数：" + wordCounter;
 	} else {
 		// failed the time trial, show the remaining number of cards
 		document.getElementById("reportTimeLimit").innerHTML = "時間制限：" + timeLimit + "秒";
+		document.getElementById("reportRemainingTime").style.display = "none";
 		document.getElementById("reportRemainingCards").innerHTML = "残りカード：" + remaining;
 	}
 	document.getElementById("body").style.background = "#333333";
