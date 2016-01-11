@@ -7,11 +7,11 @@ const ASCII_PERIOD = 190;
 /**
  * The width and height of the key.
  */
-const KEY_DIMENSIONS = 60;
+const KEY_DIMENSIONS = 50;
 /**
  * How much the key should grow in size if it is pressed.
  */
-const KEY_EXPANSION_SIZE = 6;
+const KEY_EXPANSION_SIZE = 5;
 
 var canvasKeyboard = document.getElementById("canvas");
 var keyboardCtx = canvasKeyboard.getContext("2d");
@@ -78,11 +78,11 @@ function drawShiftKey(x, y) {
 	drawKeyOutline(x, y);
 
 	keyboardCtx.beginPath();
-	keyboardCtx.font = "15pt Verdana";
+	keyboardCtx.font = "12pt Verdana";
 	keyboardCtx.textAlign = "center";
 	keyboardCtx.textBaseline = "middle";
 	keyboardCtx.fillStyle = shiftDown ? "red" : "blue";
-	keyboardCtx.fillText("shift", (x + x + 60) / 2, (y + y + 60) / 2);
+	keyboardCtx.fillText("shift", (x + x + KEY_DIMENSIONS) / 2, (y + y + KEY_DIMENSIONS) / 2);
 	keyboardCtx.closePath();
 }
 
@@ -94,12 +94,13 @@ function drawSpacebar() {
 	keyboardCtx.beginPath();
 	keyboardCtx.strokeStyle = "black";
 	keyboardCtx.fillStyle = "white";
+	
 	if (spaceDown) {
-		keyboardCtx.strokeRect(112, 217, 486, 66);
-		keyboardCtx.fillRect(112, 217, 486, 66);
+		keyboardCtx.strokeRect(100 - (KEY_EXPANSION_SIZE / 2), 190 - (KEY_EXPANSION_SIZE / 2), 410 + KEY_EXPANSION_SIZE, KEY_DIMENSIONS + KEY_EXPANSION_SIZE);
+		keyboardCtx.fillRect(100 - (KEY_EXPANSION_SIZE / 2), 190 - (KEY_EXPANSION_SIZE / 2), 410 + KEY_EXPANSION_SIZE, KEY_DIMENSIONS + KEY_EXPANSION_SIZE);
 	} else {
-		keyboardCtx.strokeRect(115, 220, 480, 60);
-		keyboardCtx.fillRect(115, 220, 480, 60);
+		keyboardCtx.strokeRect(100, 190, 410, KEY_DIMENSIONS);
+		keyboardCtx.fillRect(100, 190, 410, KEY_DIMENSIONS);
 	}
 	keyboardCtx.closePath();
 }
@@ -110,18 +111,18 @@ function drawKeyboard() {
 
 	// draw the top row of the keyboard
 	for (var i = 0; i < keyboard[0].length; i++) {
-		drawKey(70 * i + (10), 10, keyboard[0][i], keyDown[0][i]);
+		drawKey((KEY_DIMENSIONS + 10) * i + (10), 10, keyboard[0][i], keyDown[0][i]);
 	}
 
 	// draw the home row of the keyboard
 	for (var i = 0; i < keyboard[1].length; i++) {
-		drawKey(35 + 70 * i + (10), 80, keyboard[1][i], keyDown[1][i]);
+		drawKey(((KEY_DIMENSIONS + 10) / 2) + (KEY_DIMENSIONS + 10) * i + (10), 20 + (KEY_DIMENSIONS), keyboard[1][i], keyDown[1][i]);
 	}
 	
 	// draw the bottom row of the keyboard
-	drawShiftKey(10, 150);
+	drawShiftKey(10, 30 + (KEY_DIMENSIONS * 2));
 	for (var i = 0; i < keyboard[2].length; i++) {
-		drawKey(70 + 70 * i + (10), 150, keyboard[2][i], keyDown[2][i]);
+		drawKey((KEY_DIMENSIONS + 10) + (KEY_DIMENSIONS + 10) * i + (10), 30 + (KEY_DIMENSIONS * 2), keyboard[2][i], keyDown[2][i]);
 	}
 
 	drawSpacebar();
