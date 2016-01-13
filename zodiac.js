@@ -568,6 +568,16 @@ function timer() {
 	}
 }
 
+document.getElementById("input").oninput = function() {
+	var inputElement = document.getElementById("input");
+	var value = inputElement.value;
+	if (english[idx].substring(0, value.length) === value) {
+		inputElement.className = "input";
+	} else {
+		inputElement.className = "input glow";
+	}	
+};
+
 function keyDownHandler(e) {
 	if (e.keyCode === ASCII_ENTER && remaining !== 0) {
 		onClick();
