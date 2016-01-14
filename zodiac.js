@@ -88,6 +88,17 @@ var skipIdx = 0;
  */
 var fillIndices = [];
 
+var beepAudio = new Audio("audio/beep." + getAudioExtension());
+
+var errorAudio = new Audio("audio/error." + getAudioExtension());
+
+var hasWarned = false;
+
+function getAudioExtension() {
+	var video = document.createElement("audio");
+	return video.canPlayType("audio/ogg") ? "ogg" : "mp3";
+}
+
 function handleSampleSelect(fileName) {
 	sampleFileName = fileName;
 	files = null;
@@ -297,11 +308,16 @@ function show() {
  */
 function showError() {
 	document.getElementById("mistake").innerHTML = "<font color=\"red\">間違った！</font>";
+	errorAudio.play();
 }
 
 function next(answer) {
 	// check if the answer matches, or if we're just doing a read through
 	if (answer === english[idx] || type === TYPE_READING) {
+		if (type !== TYPE_READING) {
+			// no point in playing the sound if we're just reading the cards
+			beepAudio.play();
+		}
 		remaining--;
 		english[idx] = english[remaining];
 		japanese[idx] = japanese[remaining];
@@ -572,8 +588,13 @@ document.getElementById("input").oninput = function() {
 	var inputElement = document.getElementById("input");
 	var value = inputElement.value;
 	if (english[idx].substring(0, value.length) === value) {
+		hasWarned = false;
 		inputElement.className = "input";
 	} else {
+		if (!hasWarned) {
+			hasWarned = true;
+			errorAudio.play();
+		}
 		inputElement.className = "input glow";
 	}	
 };
