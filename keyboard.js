@@ -145,16 +145,18 @@ function getEventKey(e) {
 
 function keyUpHandler(e) {
 	var input = document.getElementById("input");
-	if (input.disabled) {
-		return;
-	}
-	
 	if (e.keyCode === ASCII_SHIFT) {
 		shiftDown = false;
-		requestAnimationFrame(drawKeyboard);
+		
+		if (input.disabled) {
+			requestAnimationFrame(drawKeyboard);
+		}
 	} else if (e.keyCode === ASCII_SPACEBAR) {
 		spaceDown = false;
-		requestAnimationFrame(drawKeyboard);
+		
+		if (input.disabled) {
+			requestAnimationFrame(drawKeyboard);
+		}
 	} else {
 		var key = getEventKey(e);
 		
@@ -162,7 +164,10 @@ function keyUpHandler(e) {
 			for (var j = 0; j < keyboard[i].length; j++) {
 				if (keyboard[i][j] === key) {
 					keyDown[i][j] = false;
-					requestAnimationFrame(drawKeyboard);
+		
+					if (input.disabled) {
+						requestAnimationFrame(drawKeyboard);
+					}
 					return;
 				}
 			}
