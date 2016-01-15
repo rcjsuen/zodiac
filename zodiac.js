@@ -524,7 +524,8 @@ function startCountdown() {
 
 function showReport() {
 	var current = new Date().getTime();
-	startTime = current - startTime;
+	var elapsedTime = current - startTime;
+	elapsedTime = elapsedTime / 1000;
 	
 	document.getElementById("backContent").innerHTML = "";
 	document.getElementById("frontContent").innerHTML = "";
@@ -533,19 +534,24 @@ function showReport() {
 	if (remainingTime === -1) {
 		// not a time trial, just tell the user how much time they used
 		document.getElementById("reportTimeLimit").style.display = "none";
-		document.getElementById("reportRemainingTime").innerHTML = "使った時間: " + (startTime / 1000) + "秒";
+		document.getElementById("reportRemainingTime").innerHTML = "使った時間: " + elapsedTime.toFixed(3) + "秒";
+		document.getElementById("reportAverageTime").innerHTML = "平均時間: " + (elapsedTime / wordCounter).toFixed(3) + "秒";
 		document.getElementById("reportRemainingCards").innerHTML = "カード枚数: " + wordCounter;
 	} else if (remainingTime > 0) {
 		// completed before the time trial ended, show the time used
+		var avgTime = elapsedTime / (wordCounter - remaining);
 		document.getElementById("reportTimeLimit").innerHTML = "時間制限: " + timeLimit + "秒";
 		document.getElementById("reportRemainingTime").style.display = "inline";
-		document.getElementById("reportRemainingTime").innerHTML = "使った時間: " + (startTime / 1000) + "秒";
+		document.getElementById("reportRemainingTime").innerHTML = "使った時間: " + elapsedTime.toFixed(3) + "秒";
+		document.getElementById("reportAverageTime").innerHTML = "平均時間: " + avgTime.toFixed(3) + "秒";
 		document.getElementById("reportRemainingCards").innerHTML = "カード枚数: " + wordCounter;
 	} else {
 		// failed the time trial, show the remaining number of cards
+		var completed = wordCounter - remaining;
 		document.getElementById("reportTimeLimit").innerHTML = "時間制限: " + timeLimit + "秒";
 		document.getElementById("reportRemainingTime").style.display = "none";
-		document.getElementById("reportRemainingCards").innerHTML = "正解: " + (wordCounter - remaining) + "/" + wordCounter;
+		document.getElementById("reportAverageTime").innerHTML = "平均時間: " + (timeLimit / completed).toFixed(3) + "秒";
+		document.getElementById("reportRemainingCards").innerHTML = "正解: " + completed + "/" + wordCounter;
 	}
 	document.getElementById("body").style.background = "#333333";
 	document.getElementById("content").style.display = "none";
