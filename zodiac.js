@@ -533,19 +533,19 @@ function showReport() {
 	if (remainingTime === -1) {
 		// not a time trial, just tell the user how much time they used
 		document.getElementById("reportTimeLimit").style.display = "none";
-		document.getElementById("reportRemainingTime").innerHTML = "使った時間：" + (startTime / 1000) + "秒";
-		document.getElementById("reportRemainingCards").innerHTML = "カード枚数：" + wordCounter;
+		document.getElementById("reportRemainingTime").innerHTML = "使った時間: " + (startTime / 1000) + "秒";
+		document.getElementById("reportRemainingCards").innerHTML = "カード枚数: " + wordCounter;
 	} else if (remainingTime > 0) {
 		// completed before the time trial ended, show the time used
-		document.getElementById("reportTimeLimit").innerHTML = "時間制限：" + timeLimit + "秒";
+		document.getElementById("reportTimeLimit").innerHTML = "時間制限: " + timeLimit + "秒";
 		document.getElementById("reportRemainingTime").style.display = "inline";
-		document.getElementById("reportRemainingTime").innerHTML = "使った時間：" + (startTime / 1000) + "秒";
-		document.getElementById("reportRemainingCards").innerHTML = "カード枚数：" + wordCounter;
+		document.getElementById("reportRemainingTime").innerHTML = "使った時間: " + (startTime / 1000) + "秒";
+		document.getElementById("reportRemainingCards").innerHTML = "カード枚数: " + wordCounter;
 	} else {
 		// failed the time trial, show the remaining number of cards
-		document.getElementById("reportTimeLimit").innerHTML = "時間制限：" + timeLimit + "秒";
+		document.getElementById("reportTimeLimit").innerHTML = "時間制限: " + timeLimit + "秒";
 		document.getElementById("reportRemainingTime").style.display = "none";
-		document.getElementById("reportRemainingCards").innerHTML = "残りカード：" + remaining;
+		document.getElementById("reportRemainingCards").innerHTML = "正解: " + (wordCounter - remaining) + "/" + wordCounter;
 	}
 	document.getElementById("body").style.background = "#333333";
 	document.getElementById("content").style.display = "none";
