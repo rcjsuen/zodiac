@@ -94,6 +94,8 @@ var errorAudio = new Audio("audio/error." + getAudioExtension());
 
 var hasWarned = false;
 
+var elapsedTime = -1;
+
 function getAudioExtension() {
 	var video = document.createElement("audio");
 	return video.canPlayType("audio/ogg") ? "ogg" : "mp3";
@@ -314,11 +316,16 @@ function showError() {
 function next(answer) {
 	// check if the answer matches, or if we're just doing a read through
 	if (answer === english[idx] || type === TYPE_READING) {
+		remaining--;
+		if (remaining === 0) {
+			elapsedTime = new Date().getTime() - startTime;
+			elapsedTime = elapsedTime / 1000;
+		}
+		
 		if (type !== TYPE_READING) {
 			// no point in playing the sound if we're just reading the cards
 			beepAudio.play();
 		}
-		remaining--;
 		english[idx] = english[remaining];
 		japanese[idx] = japanese[remaining];
 
@@ -523,10 +530,6 @@ function startCountdown() {
 }
 
 function showReport() {
-	var current = new Date().getTime();
-	var elapsedTime = current - startTime;
-	elapsedTime = elapsedTime / 1000;
-	
 	document.getElementById("backContent").innerHTML = "";
 	document.getElementById("frontContent").innerHTML = "";
 	document.getElementById("input").disabled = true;
@@ -537,7 +540,7 @@ function showReport() {
 		document.getElementById("reportRemainingTime").innerHTML = "使った時間: " + elapsedTime.toFixed(3) + "秒";
 		document.getElementById("reportAverageTime").innerHTML = "平均時間: " + (elapsedTime / wordCounter).toFixed(3) + "秒";
 		document.getElementById("reportRemainingCards").innerHTML = "カード枚数: " + wordCounter;
-	} else if (remainingTime > 0) {
+	} else if (elapsedTime < timeLimit) {
 		// completed before the time trial ended, show the time used
 		var avgTime = elapsedTime / (wordCounter - remaining);
 		document.getElementById("reportTimeLimit").innerHTML = "時間制限: " + timeLimit + "秒";
@@ -584,6 +587,8 @@ function timer() {
 	
 	remainingTime--;
 	if (remainingTime === 0) {
+		elapsedTime = new Date().getTime() - startTime;
+		elapsedTime = elapsedTime / 1000;
 		showReport();
 	} else {
 		setTimeout(timer, 1000);
