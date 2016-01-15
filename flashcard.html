@@ -354,7 +354,7 @@ document.getElementById("sampleClose").addEventListener("click", function() {
 		var anchor = bullets[i].getElementsByTagName("a")[0];		
 		if (anchor.hasAttribute("class")) {
 			document.getElementById("sampleName").innerHTML = anchor.innerHTML;
-			handleSampleSelect(anchor.innerHTML + ".txt");
+			handleSampleSelect(anchor.getAttribute("data-filename"));
 			break;
 		}
 	}
