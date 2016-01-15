@@ -4,8 +4,6 @@ basketball
 バスケットボール
 volleyball
 バレーボール
-rugby
-ラグビー
 badminton
 バドミントン
 tennis
