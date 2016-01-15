@@ -148,13 +148,13 @@ function keyUpHandler(e) {
 	if (e.keyCode === ASCII_SHIFT) {
 		shiftDown = false;
 		
-		if (input.disabled) {
+		if (!input.disabled) {
 			requestAnimationFrame(drawKeyboard);
 		}
 	} else if (e.keyCode === ASCII_SPACEBAR) {
 		spaceDown = false;
 		
-		if (input.disabled) {
+		if (!input.disabled) {
 			requestAnimationFrame(drawKeyboard);
 		}
 	} else {
@@ -165,7 +165,7 @@ function keyUpHandler(e) {
 				if (keyboard[i][j] === key) {
 					keyDown[i][j] = false;
 		
-					if (input.disabled) {
+					if (!input.disabled) {
 						requestAnimationFrame(drawKeyboard);
 					}
 					return;

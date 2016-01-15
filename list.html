@@ -60,6 +60,7 @@ li a:hover:not(.active) {
   <li><a id="numbers0-20Anchor" data-filename="numbers.txt">numbers (0-20)</a></li>
   <li><a id="sportsAnchor" data-filename="sports.txt">sports</a></li>
   <li><a id="subjectsAnchor" data-filename="subjects.txt">subjects</a></li>
+  <li><a id="verbsAnchor" data-filename="verbs.txt">verbs</a></li>
 </ul>
 
 <div id="contentPanel" class="preview">
@@ -67,7 +68,7 @@ li a:hover:not(.active) {
 </div>
 
 <script>
-var content = [ null, null, null, null, null, null, null ];
+var content = [ null, null, null, null, null, null, null, null ];
 var navbar = document.getElementById('navbar').getElementsByTagName('li');
 
 for (var i = 0; i < navbar.length; i++) {
@@ -75,29 +76,8 @@ for (var i = 0; i < navbar.length; i++) {
 		onNav(e);
 	},false);
 	
-	switch (i) {
-		case 0:
-			loadFile("words/days.txt", i);
-			break;
-		case 1:
-			loadFile("words/fruits.txt", i);
-			break;
-		case 2:
-			loadFile("words/months.txt", i);
-			break;
-		case 3:
-			loadFile("words/numbers-1-10.txt", i);
-			break;
-		case 4:
-			loadFile("words/numbers.txt", i);
-			break;
-		case 5:
-			loadFile("words/sports.txt", i);
-			break;
-		case 6:
-			loadFile("words/subjects.txt", i);
-			break;
-	}
+	var navAnchor = navbar[i].getElementsByTagName("a")[0];
+	loadFile("words/" + navAnchor.getAttribute("data-filename"), i);
 }
 
 function loadFile(filePath, idx) {
@@ -140,6 +120,8 @@ function onNav(e) {
 			document.getElementById("content").innerHTML = content[5];
 		} else if (anchor.getAttribute("id") === "subjectsAnchor") {
 			document.getElementById("content").innerHTML = content[6];
+		} else if (anchor.getAttribute("id") === "verbsAnchor") {
+			document.getElementById("content").innerHTML = content[7];
 		}
 	}
 }
