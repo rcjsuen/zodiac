@@ -551,9 +551,10 @@ function showReport() {
 	} else {
 		// failed the time trial, show the remaining number of cards
 		var completed = wordCounter - remaining;
+		var average = completed === 0 ? "不明" : (timeLimit / completed).toFixed(3) + "秒";
 		document.getElementById("reportTimeLimit").innerHTML = "時間制限: " + timeLimit + "秒";
 		document.getElementById("reportRemainingTime").style.display = "none";
-		document.getElementById("reportAverageTime").innerHTML = "平均時間: " + (timeLimit / completed).toFixed(3) + "秒";
+		document.getElementById("reportAverageTime").innerHTML = "平均時間: " + average;
 		document.getElementById("reportRemainingCards").innerHTML = "正解: " + completed + "/" + wordCounter;
 	}
 	document.getElementById("body").style.background = "#333333";
