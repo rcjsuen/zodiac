@@ -765,27 +765,17 @@ function mouseDown(e) {
 				return;				
 			}
 			
-			first.className = "selected";
-			second.className = "selected";
+			first.className = "cleared";
+			second.className = "cleared";
 			
-			var f = function () {
-				if (first.className === "selected") {
-					first.className = "cleared";
+			for (var i = 0; i < tables.length; i++) {
+				if (tables[i].className !== "cleared" && document.getElementById("card" + (i + 1)).style.display !== "none") {
+					return;
 				}
-				if (second.className === "selected") {
-					second.className = "cleared";
-				}
-				
-				for (var i = 0; i < tables.length; i++) {
-					if (tables[i].className !== "cleared" && document.getElementById("card" + (i + 1)).style.display !== "none") {
-						return;
-					}
-				}
-			
-				back = !back;
-				flip();
-			};
-			setTimeout(f, 0);
+			}
+		
+			back = !back;
+			flip();
 		} else {
 			playErrorAudio();
 			
