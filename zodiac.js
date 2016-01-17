@@ -572,11 +572,22 @@ function isDone(array) {
 	return true;
 }
 
+function getMaxFill(cards) {
+	if (cards === 9 || cards === 10) {
+		return 10;
+	} else if (cards === 7 || cards === 8) {
+		return 8;
+	} else if (cards >= 6) {
+		return 12;
+	}
+	return cards * 2;
+}
+
 function fill() {
 	resetMatchingCards();
 	
 	var count = 0;
-	var max = english.length * 2 < 12 ? english.length * 2: 12;
+	var max = getMaxFill(english.length);
 	var cards = [];
 	for (var i = 0; i < max; i++) {
 		cards[i] = false;
@@ -649,20 +660,14 @@ function flip() {
 	}	
 	var count = 0;
 	var cards = [ false, false, false, false, false, false, false, false, false, false, false, false ];
-	var incomplete = 0;
+	var undone = 0;
 	for (var i = 0; i < done.length; i++) {
 		if (!done[i]) {
-			incomplete += 2;
-			if (incomplete === 12) {
-				break;
-			}
+			undone++;
 		}
 	}
-
-	if (incomplete === 0) {
-		return;
-	}
-
+	
+	var incomplete = getMaxFill(undone);
 	while (count < incomplete) {
 		var matchingIdx = -1;
 		if (jp === -1) {
@@ -772,7 +777,7 @@ function mouseDown(e) {
 				}
 				
 				for (var i = 0; i < tables.length; i++) {
-					if (tables[i].className !== "cleared") {
+					if (tables[i].className !== "cleared" && document.getElementById("card" + (i + 1)).style.display !== "none") {
 						return;
 					}
 				}
