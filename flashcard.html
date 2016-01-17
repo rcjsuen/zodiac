@@ -183,6 +183,67 @@
 		}
 
 		.close:hover { background: #1bb1ee; }
+		
+		.selected {
+			background-color: #99ff99;
+		}
+
+		.default {
+			background-color: #ffffff;
+			transition: 2.0s;
+		}
+
+		.wrong {
+			background-color: #ff9999;
+		}
+	
+		.cleared {
+			background-color: #eeeeee;
+			transition: 3.0s;
+		}
+		
+		.matchingCardContent {
+			text-align: center;
+			font-size: 5vh;
+		}
+
+		.matching {
+			width: 35vh;
+			height: 18vh;
+		}
+
+		.matching .card.flipped {
+			transform: rotatex(-180deg);
+			-moz-transform: rotatex(-180deg);
+			-webkit-transform: rotatex(-180deg);
+		}
+		
+		.matching .card {
+			width: 100%;
+			height: 100%;
+			transform-style: preserve-3d;
+			-webkit-transform-style: preserve-3d;
+			transition: 0.5s;
+			-webkit-transition: 0.5s;
+		}
+
+		.matching .card .face {
+			border-style: solid;
+			width: 100%;
+			height: 100%;
+			font-family: Calibri;
+			text-align: center;
+		}
+		
+		.matching .card .front {
+			border-style: solid;
+		}
+		
+		.matching .card .back {
+			border-style: solid;
+			transform: rotatex(-180deg);
+			-webkit-transform: rotatex(-180deg);
+		}
     </style>
   </head>
   <body id="body">
@@ -195,7 +256,7 @@
 <p><canvas id="trialTimer" width="100" height="100"/></p>
 <p id="remaining" class="general"></p>
 
-<div class="flip"> 
+<div id="flashcardDiv" class="flip"> 
     <div id="card" class="card"> 
         <div class="face front" id="front">
         	<table bgcolor="#ffffff" height="200" width="900" id="frontTable">
@@ -229,6 +290,9 @@
 <br/><br/>
 <button class="input" type="button" onClick="onClick()">次へ</button>
 <button class="input" type="button" onClick="onShow()">答えを示す</button>
+<p/>
+
+<p id="matchingContent" class="input" style="display: none;">
 <p/>
 
 <canvas id="canvas" width=610" height="250"></canvas>
@@ -266,6 +330,7 @@
 			<li><a id="flashcard" class="active">フラッシュカード</a></li>
 			<li><a id="alphabet">アルファベット抜け</a></li>
 			<li><a id="reading">読む練習</a></li>
+			<li><a id="matching">マッチング</a></li>
 		</ul>
 		</td>
 		<td valign="top" bgcolor="#ffffff" style="padding: 2" width="60%">
@@ -275,6 +340,7 @@
 		<input type="radio" id="readingEnglish" name="readingLanguage" checked="true">英語</input><br/>
 		<input type="radio" name="readingLanguage">日本語</input><br/>
 		</p>
+		<p id="matchingOptions" style="display: none;">個別のセットアップがありません。</p>
 		</td>
 		</tr>
 		</table>
@@ -330,14 +396,22 @@ function onNav(e) {
 			document.getElementById("keyboardOptions").style.display = "inline";
 			document.getElementById("alphabetOptions").style.display = "none";
 			document.getElementById("readingOptions").style.display = "none";
+			document.getElementById("matchingOptions").style.display = "none";
 		} else if (id === "alphabet") {
 			document.getElementById("keyboardOptions").style.display = "inline";
 			document.getElementById("alphabetOptions").style.display = "block";
 			document.getElementById("readingOptions").style.display = "none";
+			document.getElementById("matchingOptions").style.display = "none";
 		} else if (id === "reading") {
 			document.getElementById("keyboardOptions").style.display = "none";
 			document.getElementById("alphabetOptions").style.display = "none";
 			document.getElementById("readingOptions").style.display = "inline";
+			document.getElementById("matchingOptions").style.display = "none";
+		} else if (id === "matching") {
+			document.getElementById("keyboardOptions").style.display = "none";
+			document.getElementById("alphabetOptions").style.display = "none";
+			document.getElementById("readingOptions").style.display = "none";
+			document.getElementById("matchingOptions").style.display = "inline";
 		}
 	}
 }
@@ -391,6 +465,91 @@ function showKeyboard() {
 		document.getElementById("canvas").style.display = "none";
 	}
 }
+
+function createMatchingTable() {
+	var table = document.createElement("table");
+	table.setAttribute("id", "table");
+	table.setAttribute("align", "center");
+	table.setAttribute("cellpadding", "10");
+	document.getElementById("matchingContent").appendChild(table);
+	
+	for (var j = 0; j < 4; j++) {
+		var tr = document.createElement("tr");
+		table.appendChild(tr);
+		
+		for (var count = 1; count < 4; count++) {
+			var i = j * 3 + count;
+			
+		
+			var td = document.createElement("td");
+			tr.appendChild(td);
+			
+			var matchingDiv = document.createElement("div");
+			matchingDiv.setAttribute("class", "matching");
+			td.appendChild(matchingDiv);
+			
+			var cardDiv = document.createElement("div");
+			cardDiv.setAttribute("id", "card" + i);
+			cardDiv.setAttribute("class", "card");
+			matchingDiv.appendChild(cardDiv);
+			
+			var frontDiv = document.createElement("div");
+			frontDiv.setAttribute("class", "face front");
+			frontDiv.setAttribute("id", "front" + i);
+			cardDiv.appendChild(frontDiv);
+			
+			var frontTable = document.createElement("table");
+			frontTable.setAttribute("bgcolor", "#ffffff");
+			frontTable.setAttribute("width", "100%");
+			frontTable.setAttribute("height", "100%");
+			frontTable.setAttribute("id", "frontTable" + i);
+			frontDiv.appendChild(frontTable);
+			
+			var frontTr = document.createElement("tr");
+			frontTable.appendChild(frontTr);
+			
+			var frontTd = document.createElement("td");
+			frontTr.appendChild(frontTd);
+			
+			var frontP = document.createElement("p");
+			frontP.setAttribute("id", "frontContent" + i);
+			frontP.setAttribute("class", "matchingCardContent");
+			frontTd.appendChild(frontP);
+			
+			var backDiv = document.createElement("div");
+			backDiv.setAttribute("class", "face back");
+			backDiv.setAttribute("id", "back" + i);
+			backDiv.setAttribute("style", "display: none;");
+			cardDiv.appendChild(backDiv);
+			
+			var backTable = document.createElement("table");
+			backTable.setAttribute("id", "backTable" + i);
+			backTable.setAttribute("width", "100%");
+			backTable.setAttribute("height", "100%");
+			backTable.setAttribute("bgcolor", "#ffffff");
+			backTable.setAttribute("style", "visibility: hidden;");
+			backDiv.appendChild(backTable);
+			
+			var backTr = document.createElement("tr");
+			backTable.appendChild(backTr);
+			
+			var backTd = document.createElement("td");
+			backTr.appendChild(backTd);
+			
+			var backP = document.createElement("p");
+			backP.setAttribute("id", "backContent" + i);
+			backP.setAttribute("class", "matchingCardContent");
+			backTd.appendChild(backP);
+		}
+	}
+	addMouseListener();
+	
+	for (var j = 1; j < 13; j++) {
+		frontTables[j - 1] = document.getElementById("frontTable" + j);
+		backTables[j - 1] = document.getElementById("backTable" + j);
+	}
+}
+createMatchingTable();
 </script>
 
 </body>
