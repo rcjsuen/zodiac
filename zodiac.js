@@ -17,11 +17,17 @@ const TYPE_ALPHABET = TYPE_FLASHCARD + 1;
 const TYPE_READING = TYPE_ALPHABET + 1;
 
 /**
- * The type of flashcard run that has been selected.TYPE_READING
+ * The user will have to select two matching cards.
+ */
+const TYPE_MATCHING = TYPE_READING + 1;
+
+/**
+ * The type of flashcard run that has been selected.
  * 
  * @see TYPE_FLASHCARD
  * @see TYPE_ALPHABET
  * @see TYPE_READING
+ * @see TYPE_MATCHING
  */
 var type = -1;
 
@@ -88,6 +94,13 @@ var skipIdx = 0;
  */
 var fillIndices = [];
 
+/**
+ * Records how many words have been matched during a matching run.
+ * 
+ * @see TYPE_MATCHING
+ */
+var done = [];
+
 var beepAudio = new Audio("audio/beep." + getAudioExtension());
 
 var errorAudio = new Audio("audio/error." + getAudioExtension());
@@ -95,6 +108,14 @@ var errorAudio = new Audio("audio/error." + getAudioExtension());
 var hasWarned = false;
 
 var elapsedTime = -1;
+
+function playBeepAudio() {
+	beepAudio.play();
+}
+
+function playErrorAudio() {
+	errorAudio.play();
+}
 
 function getAudioExtension() {
 	var video = document.createElement("audio");
@@ -127,6 +148,7 @@ function readSample(restart) {
 			for (var i = 0; i < strings.length / 2; i++) {
 				english[wordCounter] = strings[i * 2].trim();
 				japanese[wordCounter] = strings[(i * 2) + 1].trim();
+				done[wordCounter] = false;
 				wordCounter++;
 			}
 			remaining = english.length;
@@ -173,6 +195,7 @@ function readFiles(restart) {
 		for (var i = 0; i < strings.length / 2; i++) {
 			english[wordCounter] = strings[i * 2].trim();
 			japanese[wordCounter] = strings[(i * 2) + 1].trim();
+			done[wordCounter] = false;
 			wordCounter++;
 		}
 		remaining = english.length;
@@ -310,21 +333,17 @@ function show() {
  */
 function showError() {
 	document.getElementById("mistake").innerHTML = "<font color=\"red\">間違った！</font>";
-	errorAudio.play();
+	playErrorAudio();
 }
 
 function next(answer) {
 	// check if the answer matches, or if we're just doing a read through
 	if (answer === english[idx] || type === TYPE_READING) {
 		remaining--;
-		if (remaining === 0) {
-			elapsedTime = new Date().getTime() - startTime;
-			elapsedTime = elapsedTime / 1000;
-		}
 		
 		if (type !== TYPE_READING) {
 			// no point in playing the sound if we're just reading the cards
-			beepAudio.play();
+			playBeepAudio();
 		}
 		english[idx] = english[remaining];
 		japanese[idx] = japanese[remaining];
@@ -480,6 +499,8 @@ function getType() {
 				return TYPE_ALPHABET;
 			} else if (id === "reading") {
 				return TYPE_READING;
+			} else if (id === "matching") {
+				return TYPE_MATCHING;
 			}
 			throw new Error("Unknown type: " + id);
 		}
@@ -503,9 +524,19 @@ function startCountdown() {
 			document.getElementById("readingContent").style.display = "inline";
 			document.getElementById("canvas").style.display = "none";
 			break;
+		case TYPE_MATCHING:
+			document.getElementById("flashcardDiv").style.display = "none";
+			document.getElementById("flashcardContent").style.display = "none";
+			document.getElementById("matchingContent").style.display = "inline";
+			document.getElementById("canvas").style.display = "none";
+			break;
 	}
 	
-	show();
+	if (type === TYPE_MATCHING) {
+		fill();	
+	} else {
+		show();
+	}
 	// hide the setup popup
 	document.getElementById("openModal").style.display = "none";
 	
@@ -529,7 +560,264 @@ function startCountdown() {
 	}
 }
 
+var jp = -1;
+
+function isDone(array) {
+	for (var i = 0; i < array.length; i++) {
+		if (!array[i]) {
+			return false;
+		}
+	}
+	
+	return true;
+}
+
+function fill() {
+	resetMatchingCards();
+	
+	var count = 0;
+	var max = english.length * 2 < 12 ? english.length * 2: 12;
+	var cards = [];
+	for (var i = 0; i < max; i++) {
+		cards[i] = false;
+	}
+	
+	while (count < 12 && !isDone(cards)) {
+		var matchingIdx = -1;
+		if (jp === -1) {
+			matchingIdx = Math.floor(Math.random() * wordCounter);
+			while (done[matchingIdx]) {
+				matchingIdx = Math.floor(Math.random() * wordCounter);
+			}
+		} else {
+			matchingIdx = jp;
+		}
+
+		var c = Math.floor(Math.random() * cards.length);
+		while (cards[c]) {
+			c = Math.floor(Math.random() * cards.length);
+		}
+		var p = document.getElementById("frontContent" + (c + 1));
+		if (jp === -1) {
+			p.innerHTML = english[matchingIdx];
+			jp = matchingIdx;
+		} else {
+			p.innerHTML = japanese[jp];
+			jp = -1;
+		}
+		cards[c] = true;
+		done[matchingIdx] = true;
+		count++;
+	}
+	
+	if (cards.length < 12) {
+		hideOtherMatchingCards(cards.length);
+	}
+}
+
+function resetMatchingCards() {
+	for (var i = 1; i < 13; i++) {
+		document.getElementById("front" + i).style.display = "block";
+		document.getElementById("back" + i).style.display = "none";
+			
+		document.getElementById("card" + i).className = "card";
+		document.getElementById("card" + i).style.display = "block";
+		
+		document.getElementById("frontTable" + i).style.visibility = "visible";
+		document.getElementById("frontTable" + i).className = "";
+		
+		document.getElementById("backTable" + i).style.visibility = "hidden";
+		document.getElementById("backTable" + i).className = "";
+	}
+	
+	back = false;
+}
+
+function hideOtherMatchingCards(offset) {
+	for (var i = offset + 1; i < 13; i++) {
+		document.getElementById("card" + i).style.display = "none";
+	}
+}
+
+var back = false;
+
+function flip() {
+	for (var i = 0; i < 12; i++) {
+		var content = back ? "backContent" + (i + 1) : "frontContent" + (i + 1);
+		var p = document.getElementById(content);
+		p.innerHTML = "";
+	}	
+	var count = 0;
+	var cards = [ false, false, false, false, false, false, false, false, false, false, false, false ];
+	var incomplete = 0;
+	for (var i = 0; i < done.length; i++) {
+		if (!done[i]) {
+			incomplete += 2;
+			if (incomplete === 12) {
+				break;
+			}
+		}
+	}
+
+	if (incomplete === 0) {
+		return;
+	}
+
+	while (count < incomplete) {
+		var matchingIdx = -1;
+		if (jp === -1) {
+			matchingIdx = Math.floor(Math.random() * wordCounter);
+			while (done[matchingIdx]) {
+				matchingIdx = Math.floor(Math.random() * wordCounter);
+			}
+		} else {
+			matchingIdx = jp;
+		}
+
+		var c = Math.floor(Math.random() * incomplete);
+		while (cards[c]) {
+			c = Math.floor(Math.random() * incomplete);
+		}
+		content = back ? "backContent" + (c + 1) : "frontContent" + (c + 1);
+		p = document.getElementById(content);
+		if (jp === -1) {
+			p.innerHTML = english[matchingIdx];
+			jp = matchingIdx;
+		} else {
+			p.innerHTML = japanese[jp];
+			jp = -1;
+		}
+		cards[c] = true;
+		done[matchingIdx] = true;
+		count++;
+	}
+
+	for (var i = 1; i < 13; i++) {
+		var card = document.getElementById("card" + i);
+		if (card.className === "card") {
+			card.className = "card flipped";
+		} else {
+			card.className = "card";
+		}
+
+		if (back) {
+			document.getElementById("front" + i).style.display = "none";
+			document.getElementById("back" + i).style.display = "block";
+			
+			document.getElementById("frontTable" + i).style.visibility = "hidden";
+			document.getElementById("backTable" + i).style.visibility = "visible";
+			document.getElementById("backTable" + i).className = "";
+		} else {
+			document.getElementById("front" + i).style.display = "block";
+			document.getElementById("back" + i).style.display = "none";
+			
+			document.getElementById("frontTable" + i).style.visibility = "visible";
+			document.getElementById("backTable" + i).style.visibility = "hidden";
+			document.getElementById("frontTable" + i).className = "";
+		}
+	}
+	
+	if (incomplete < 12) {
+		hideOtherMatchingCards(incomplete);
+	}
+}
+
+var frontTables = [];
+var backTables = [];
+
+function mouseDown(e) {
+	var innerDiv = e.currentTarget.children[back ? 1 : 0];
+	var table = innerDiv.getElementsByTagName("table")[0];
+	if (table.className === "cleared") {
+		return;
+	}
+
+	table.className = table.className === "" || table.className === "wrong" || table.className === "default" ? "selected" : "";
+
+	var first = null;
+	var second = null;
+	var tables = back ? backTables : frontTables;
+	for (var i = 0; i < tables.length; i++) {
+		if (tables[i].className === "selected") {
+			if (first === null) {
+				first = tables[i];
+			} else {
+				second = tables[i];
+				break;
+			}
+		}
+	}
+
+	if (first !== null && second !== null) {
+		var one = first.children[0].children[0].children[0].innerHTML;
+		var two = second.children[0].children[0].children[0].innerHTML;
+		if (matches(one, two)) {
+			remaining--;
+			playBeepAudio();
+			
+			if (remaining === 0) {
+				showReport();
+				return;				
+			}
+			
+			first.className = "selected";
+			second.className = "selected";
+			
+			var f = function () {
+				if (first.className === "selected") {
+					first.className = "cleared";
+				}
+				if (second.className === "selected") {
+					second.className = "cleared";
+				}
+				
+				for (var i = 0; i < tables.length; i++) {
+					if (tables[i].className !== "cleared") {
+						return;
+					}
+				}
+			
+				back = !back;
+				flip();
+			};
+			setTimeout(f, 0);
+		} else {
+			playErrorAudio();
+			
+			first.className = "wrong";
+			second.className = "wrong";
+
+			var f = function () {
+				if (first.className === "wrong") {
+					first.className = "default";
+				}
+				if (second.className === "wrong") {
+					second.className = "default";
+				}
+			};
+			setTimeout(f, 500);
+		}
+	}
+}
+
+function matches(one, two) {
+	var idx1 = english.indexOf(one);
+	if (idx1 === -1) {
+		return japanese.indexOf(one) === english.indexOf(two);
+	} else {
+		return japanese.indexOf(two) === idx1;
+	}
+}
+
+function addMouseListener() {
+	for (var tables = 1; tables < 13; tables++) {
+		document.getElementById("card" + tables).addEventListener("mousedown", mouseDown, false);
+	}	
+}
+
 function showReport() {
+	elapsedTime = new Date().getTime() - startTime;
+	elapsedTime = elapsedTime / 1000;
 	document.getElementById("backContent").innerHTML = "";
 	document.getElementById("frontContent").innerHTML = "";
 	document.getElementById("input").disabled = true;
@@ -588,8 +876,6 @@ function timer() {
 	
 	remainingTime--;
 	if (remainingTime === 0) {
-		elapsedTime = new Date().getTime() - startTime;
-		elapsedTime = elapsedTime / 1000;
 		showReport();
 	} else {
 		setTimeout(timer, 1000);
