@@ -511,6 +511,7 @@ function getType() {
 
 function startCountdown() {
 	type = getType();
+	hasWarned = false;
 	
 	switch (type) {
 		case TYPE_ALPHABET:
