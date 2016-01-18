@@ -815,9 +815,9 @@ function showReport() {
 	elapsedTime = new Date().getTime() - startTime;
 	elapsedTime = elapsedTime / 1000;
 
-	// if the elapsed time is greater or there are cards remaining then it's a failure,
+	// for a time trial, if the elapsed time is greater or there are cards remaining then it's a failure,
 	// successes should only be possible if the elapsed time is less and there are no cards
-	if (elapsedTime > timeLimit || remaining !== 0) {
+	if (timeLimit !== -1 && (elapsedTime > timeLimit || remaining !== 0)) {
 		remainingTime = 0;
 	}
 
