@@ -511,6 +511,7 @@ function getType() {
 
 function startCountdown() {
 	type = getType();
+	hasWarned = false;
 	
 	switch (type) {
 		case TYPE_ALPHABET:
@@ -572,11 +573,22 @@ function isDone(array) {
 	return true;
 }
 
+function getMaxFill(cards) {
+	if (cards === 9 || cards === 10) {
+		return 10;
+	} else if (cards === 7 || cards === 8) {
+		return 8;
+	} else if (cards >= 6) {
+		return 12;
+	}
+	return cards * 2;
+}
+
 function fill() {
 	resetMatchingCards();
 	
 	var count = 0;
-	var max = english.length * 2 < 12 ? english.length * 2: 12;
+	var max = getMaxFill(english.length);
 	var cards = [];
 	for (var i = 0; i < max; i++) {
 		cards[i] = false;
@@ -649,20 +661,14 @@ function flip() {
 	}	
 	var count = 0;
 	var cards = [ false, false, false, false, false, false, false, false, false, false, false, false ];
-	var incomplete = 0;
+	var undone = 0;
 	for (var i = 0; i < done.length; i++) {
 		if (!done[i]) {
-			incomplete += 2;
-			if (incomplete === 12) {
-				break;
-			}
+			undone++;
 		}
 	}
-
-	if (incomplete === 0) {
-		return;
-	}
-
+	
+	var incomplete = getMaxFill(undone);
 	while (count < incomplete) {
 		var matchingIdx = -1;
 		if (jp === -1) {
@@ -760,27 +766,17 @@ function mouseDown(e) {
 				return;				
 			}
 			
-			first.className = "selected";
-			second.className = "selected";
+			first.className = "cleared";
+			second.className = "cleared";
 			
-			var f = function () {
-				if (first.className === "selected") {
-					first.className = "cleared";
+			for (var i = 0; i < tables.length; i++) {
+				if (tables[i].className !== "cleared" && document.getElementById("card" + (i + 1)).style.display !== "none") {
+					return;
 				}
-				if (second.className === "selected") {
-					second.className = "cleared";
-				}
-				
-				for (var i = 0; i < tables.length; i++) {
-					if (tables[i].className !== "cleared") {
-						return;
-					}
-				}
-			
-				back = !back;
-				flip();
-			};
-			setTimeout(f, 0);
+			}
+		
+			back = !back;
+			flip();
 		} else {
 			playErrorAudio();
 			
@@ -818,6 +814,13 @@ function addMouseListener() {
 function showReport() {
 	elapsedTime = new Date().getTime() - startTime;
 	elapsedTime = elapsedTime / 1000;
+
+	// if the elapsed time is greater or there are cards remaining then it's a failure,
+	// successes should only be possible if the elapsed time is less and there are no cards
+	if (elapsedTime > timeLimit || remaining !== 0) {
+		remainingTime = 0;
+	}
+
 	document.getElementById("backContent").innerHTML = "";
 	document.getElementById("frontContent").innerHTML = "";
 	document.getElementById("input").disabled = true;
@@ -828,7 +831,7 @@ function showReport() {
 		document.getElementById("reportRemainingTime").innerHTML = "使った時間: " + elapsedTime.toFixed(3) + "秒";
 		document.getElementById("reportAverageTime").innerHTML = "平均時間: " + (elapsedTime / wordCounter).toFixed(3) + "秒";
 		document.getElementById("reportRemainingCards").innerHTML = "カード枚数: " + wordCounter;
-	} else if (elapsedTime < timeLimit) {
+	} else if (remainingTime !== 0) {
 		// completed before the time trial ended, show the time used
 		var avgTime = elapsedTime / (wordCounter - remaining);
 		document.getElementById("reportTimeLimit").innerHTML = "時間制限: " + timeLimit + "秒";
