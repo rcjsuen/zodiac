@@ -814,6 +814,13 @@ function addMouseListener() {
 function showReport() {
 	elapsedTime = new Date().getTime() - startTime;
 	elapsedTime = elapsedTime / 1000;
+
+	// if the elapsed time is greater or there are cards remaining then it's a failure,
+	// successes should only be possible if the elapsed time is less and there are no cards
+	if (elapsedTime > timeLimit || remaining !== 0) {
+		remainingTime = 0;
+	}
+
 	document.getElementById("backContent").innerHTML = "";
 	document.getElementById("frontContent").innerHTML = "";
 	document.getElementById("input").disabled = true;
@@ -824,7 +831,7 @@ function showReport() {
 		document.getElementById("reportRemainingTime").innerHTML = "使った時間: " + elapsedTime.toFixed(3) + "秒";
 		document.getElementById("reportAverageTime").innerHTML = "平均時間: " + (elapsedTime / wordCounter).toFixed(3) + "秒";
 		document.getElementById("reportRemainingCards").innerHTML = "カード枚数: " + wordCounter;
-	} else if (elapsedTime < timeLimit) {
+	} else if (remainingTime !== 0) {
 		// completed before the time trial ended, show the time used
 		var avgTime = elapsedTime / (wordCounter - remaining);
 		document.getElementById("reportTimeLimit").innerHTML = "時間制限: " + timeLimit + "秒";
