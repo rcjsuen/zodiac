@@ -317,7 +317,7 @@ function getRemovalDisplayText() {
 function show() {
 	idx = Math.floor(Math.random() * remaining);
 	updateFlashCard();
-	document.getElementById("remaining").innerHTML = "残り： " + remaining + "/" + wordCounter;
+	updateRemaining();
 	
 	if (type === TYPE_FLASHCARD) {
 		document.getElementById("input").value = "";
@@ -326,6 +326,10 @@ function show() {
 		document.getElementById("alphabetsDisplay").innerHTML = text;
 		document.getElementById("alphabetsInput").innerHTML = text;
 	}
+}
+
+function updateRemaining() {
+	document.getElementById("remaining").innerHTML = "残り： " + remaining + "/" + wordCounter;
 }
 
 /**
@@ -534,7 +538,8 @@ function startCountdown() {
 	}
 	
 	if (type === TYPE_MATCHING) {
-		fill();	
+		fill();
+		updateRemaining();
 	} else {
 		show();
 	}
@@ -759,6 +764,7 @@ function mouseDown(e) {
 		var two = second.children[0].children[0].children[0].innerHTML;
 		if (matches(one, two)) {
 			remaining--;
+			updateRemaining();
 			playBeepAudio();
 			
 			if (remaining === 0) {
