@@ -170,9 +170,14 @@ function readSample(restart) {
 }
 
 function handleFileSelect(e) {
-	files = e.target.files;
-	sampleFileName = null;
-	readFiles(false);
+	if (e.target.files.length === 0) {
+		// the user has cancelled the dialog, disable the start button
+		document.getElementById("startBtn").disabled = true;
+	} else {
+		files = e.target.files;
+		sampleFileName = null;
+		readFiles(false);
+	}
 }
 
 /**
