@@ -868,6 +868,9 @@ function showReport() {
 function restart() {
 	document.getElementById("restartBtn").disabled = true;
 	
+	// redraw the keyboard as fast inputs may not get processed at the conclusion of a run
+	drawKeyboard();
+	
 	if (files === null) {
 		readSample(true);
 	} else {
