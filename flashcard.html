@@ -334,7 +334,7 @@
 		</ul>
 		</td>
 		<td valign="top" bgcolor="#ffffff" style="padding: 2" width="60%">
-		<p id="keyboardOptions"><input type="checkbox" state="true" checked="true" onClick="showKeyboard()">バーチャルキーボード</input></p>
+		<p id="keyboardOptions"><input type="checkbox" id="keyboardCheckbox" state="true" checked="true">バーチャルキーボード</input></p>
 		<p id="alphabetOptions" style="display: none;"><input type="number" id="alphabetRemoval" min="1" value="1">抜け</input></p>
 		<p id="readingOptions" style="display: none;">カードの言語:<br/>
 		<input type="radio" id="readingEnglish" name="readingLanguage" checked="true">英語</input><br/>
@@ -344,7 +344,7 @@
 		</td>
 		</tr>
 		</table>
-		<p align="center"><button id="startBtn" type="button" onClick="startCountdown()" disabled>スタート</button></p>
+		<p align="center"><button id="startBtn" type="button" onClick="restart()" disabled>スタート</button></p>
 	</div>
 </div>
 
@@ -358,7 +358,10 @@
 		<p id="reportRemainingTime" class="report"></p>
 		<p id="reportAverageTime" class="report"></p>
 		<p id="reportRemainingCards" class="report"></p>
-		<p align="center"><button id="restartBtn" type="button" onClick="restart()" disabled>もう一回</button></p>
+		<p align="center">
+			<button id="setupBtn" type="button" onClick="setup()">セットアップに戻る</button>
+			<button id="restartBtn" type="button" onClick="restart()">もう一回</button>
+		</p>
 	</div>
 </div>
 
@@ -452,18 +455,6 @@ function onSampleClick() {
 function toggleTimeTrial() {
 	// if it's not a time trial, disable the time limit input field
 	document.getElementById("time").disabled = !document.getElementById("timeCheckbox").checked;
-}
-
-var enableKeyboard = true;
-
-function showKeyboard() {
-	enableKeyboard = !enableKeyboard;
-
-	if (enableKeyboard) {
-		document.getElementById("canvas").style.display = "inline";
-	} else {
-		document.getElementById("canvas").style.display = "none";
-	}
 }
 
 function createMatchingTable() {
