@@ -125,16 +125,13 @@ function getAudioExtension() {
 function handleSampleSelect(fileName) {
 	sampleFileName = fileName;
 	files = null;
-	readSample(false);
+	document.getElementById("startBtn").disabled = false;
 }
 
 /**
  * Read the sample file and prompt its contents as a flashcard.	
- * 
- * @param restart true if this run was prompted by a restart, false
- * otherwise
  */
-function readSample(restart) {
+function readSample() {
 	var xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function() {
 		if (xhttp.readyState === 4 && xhttp.status === 200) {
@@ -154,15 +151,10 @@ function readSample(restart) {
 			remaining = english.length;
 	
 			fileCounter++;
-	
-			document.getElementById("startBtn").disabled = false;
-			document.getElementById("restartBtn").disabled = false;
 			
-			if (restart) {
-				document.getElementById("report").style.display = "none";
-				document.getElementById("input").value = "";
-				startCountdown();
-			}
+			document.getElementById("report").style.display = "none";
+			document.getElementById("input").value = "";
+			startCountdown();
 		}
 	};
 	xhttp.open("GET", "words/" + sampleFileName, true);
@@ -176,18 +168,15 @@ function handleFileSelect(e) {
 	} else {
 		files = e.target.files;
 		sampleFileName = null;
-		readFiles(false);
+		document.getElementById("startBtn").disabled = false;
 	}
 }
 
 /**
  * Reads the files that the user has selected locally and prompts them
  * as flashcards.
- * 
- * @param restart true if this run was prompted by a restart, false
- * otherwise
  */
-function readFiles(restart) {
+function readFiles() {
 	wordCounter = 0;
 	fileCounter = 0;
 	english = [];
@@ -210,14 +199,9 @@ function readFiles(restart) {
 		if (fileCounter !== files.length) {
 			reader.readAsText(files[fileCounter], "UTF-8");
 		} else {
-			document.getElementById("restartBtn").disabled = false;
-			document.getElementById("startBtn").disabled = false;
-			
-			if (restart) {
-				document.getElementById("report").style.display = "none";
-				document.getElementById("input").value = "";
-				startCountdown();
-			}
+			document.getElementById("report").style.display = "none";
+			document.getElementById("input").value = "";
+			startCountdown();
 		}
 	};
 
@@ -519,27 +503,52 @@ function getType() {
 }
 
 function startCountdown() {
+	document.getElementById("restartBtn").disabled = false;
+
 	type = getType();
 	hasWarned = false;
+
+	var showKeyboard = document.getElementById("keyboardCheckbox").checked;
 	
 	switch (type) {
+		case TYPE_FLASHCARD:
+			document.getElementById("flashcardDiv").style.display = "block";
+			document.getElementById("flashcardContent").style.display = "inline";
+			document.getElementById("alphabetsContent").style.display = "none";
+			document.getElementById("readingContent").style.display = "none";
+			document.getElementById("matchingContent").style.display = "none";
+			break;
 		case TYPE_ALPHABET:
 			remove = parseInt(document.getElementById("alphabetRemoval").value, 10);
 			
+			document.getElementById("flashcardDiv").style.display = "block";
 			document.getElementById("flashcardContent").style.display = "none";
 			document.getElementById("alphabetsContent").style.display = "inline";
+			document.getElementById("readingContent").style.display = "none";
+			document.getElementById("matchingContent").style.display = "none";
 			break;
 		case TYPE_READING:
+			document.getElementById("flashcardDiv").style.display = "block";
 			document.getElementById("flashcardContent").style.display = "none";
+			document.getElementById("alphabetsContent").style.display = "none";
 			document.getElementById("readingContent").style.display = "inline";
-			document.getElementById("canvas").style.display = "none";
+			document.getElementById("matchingContent").style.display = "none";
+			showKeyboard = false;
 			break;
 		case TYPE_MATCHING:
 			document.getElementById("flashcardDiv").style.display = "none";
 			document.getElementById("flashcardContent").style.display = "none";
+			document.getElementById("alphabetsContent").style.display = "none";
+			document.getElementById("readingContent").style.display = "none";
 			document.getElementById("matchingContent").style.display = "inline";
-			document.getElementById("canvas").style.display = "none";
+			showKeyboard = false;
 			break;
+	}
+
+	if (showKeyboard) {
+		document.getElementById("canvas").style.display = "inline";
+	} else {
+		document.getElementById("canvas").style.display = "none";
 	}
 	
 	if (type === TYPE_MATCHING) {
@@ -554,11 +563,15 @@ function startCountdown() {
 	updateFlashCard();
 	
 	if (document.getElementById("timeCheckbox").checked) {
-		// show the timer
+		timeLimit = parseInt(document.getElementById("time").value, 10);
+		remainingTime = timeLimit;
+		// show the countdown timer
 		document.getElementById("countdown").style.display = "inline";
 		start = new Date().getTime();
 		drawCountdownCanvas();
 	} else {
+		timeLimit = -1;
+		remainingTime = -1;
 		// not a time trial, remove the trial timer
 		document.getElementById("trialTimer").style.display = "none";
 		// show the content
@@ -839,14 +852,16 @@ function showReport() {
 	if (remainingTime === -1) {
 		// not a time trial, just tell the user how much time they used
 		document.getElementById("reportTimeLimit").style.display = "none";
+		document.getElementById("reportRemainingTime").style.display = "inline";
 		document.getElementById("reportRemainingTime").innerHTML = "使った時間: " + elapsedTime.toFixed(3) + "秒";
 		document.getElementById("reportAverageTime").innerHTML = "平均時間: " + (elapsedTime / wordCounter).toFixed(3) + "秒";
 		document.getElementById("reportRemainingCards").innerHTML = "カード枚数: " + wordCounter;
 	} else if (remainingTime !== 0) {
 		// completed before the time trial ended, show the time used
 		var avgTime = elapsedTime / (wordCounter - remaining);
+		document.getElementById("reportTimeLimit").style.display = "inline";
 		document.getElementById("reportTimeLimit").innerHTML = "時間制限: " + timeLimit + "秒";
-		document.getElementById("reportRemainingTime").style.display = "inline";
+		document.getElementById("reportRemainingTime").style.display = "block";
 		document.getElementById("reportRemainingTime").innerHTML = "使った時間: " + elapsedTime.toFixed(3) + "秒";
 		document.getElementById("reportAverageTime").innerHTML = "平均時間: " + avgTime.toFixed(3) + "秒";
 		document.getElementById("reportRemainingCards").innerHTML = "カード枚数: " + wordCounter;
@@ -854,6 +869,7 @@ function showReport() {
 		// failed the time trial, show the remaining number of cards
 		var completed = wordCounter - remaining;
 		var average = completed === 0 ? "不明" : (timeLimit / completed).toFixed(3) + "秒";
+		document.getElementById("reportTimeLimit").style.display = "inline";
 		document.getElementById("reportTimeLimit").innerHTML = "時間制限: " + timeLimit + "秒";
 		document.getElementById("reportRemainingTime").style.display = "none";
 		document.getElementById("reportAverageTime").innerHTML = "平均時間: " + average;
@@ -872,16 +888,20 @@ function restart() {
 	drawKeyboard();
 	
 	if (files === null) {
-		readSample(true);
+		readSample();
 	} else {
-		readFiles(true);
+		readFiles();
 	}
 }
 
+function setup() {
+	// hide the report
+	document.getElementById("report").style.display = "none";
+	// show the setup dialog again
+	document.getElementById("openModal").style.display = "inline";
+}
+
 function startTimeTrial() {
-	timeLimit = parseInt(document.getElementById("time").value, 10);
-	remainingTime = timeLimit;
-	
 	setTimeout(timer, 1000);
 }
 
@@ -957,6 +977,7 @@ function drawCountdownCanvas() {
 		startTime = new Date().getTime();
 		
 		startTimeTrial();
+		document.getElementById("trialTimer").style.display = "inline";
 		drawTimerCanvas();
 		return;
 	}
