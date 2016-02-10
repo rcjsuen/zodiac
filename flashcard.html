@@ -198,7 +198,7 @@
 		}
 	
 		.cleared {
-			background-color: #eeeeee;
+			background-color: #ffff99;
 			transition: 3.0s;
 		}
 		
@@ -295,6 +295,89 @@
 <p id="matchingContent" class="input" style="display: none;">
 <p/>
 
+<p id="chooseContent" class="input" style="display: none;">
+<table id="table" align="center" cellpadding="10">
+<tr>
+
+<td>
+<div class="matching">
+<div id="chooseCard1" class="card">
+<div class="face front" id="chooseFront1">
+<table bgcolor="#ffffff" width="100%" height="100%" id="chooseFrontTable1">
+<tr>	
+<td>
+<p id="chooseFrontContent1" class="matchingCardContent"></p>
+</td>
+</tr>
+</table>
+</div>
+<div class="face back" id="chooseBack1" style="display: none;">
+<table id="chooseBackTable1" width="100%" height="100%" bgcolor="#ffffff" style="visibility: hidden;">
+<tr>
+<td>
+<p id="chooseBackContent1" class="matchingCardContent"></p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</td>
+
+<td>
+<div class="matching">
+<div id="chooseCard2" class="card">
+<div class="face front" id="chooseFront2">
+<table bgcolor="#ffffff" width="100%" height="100%" id="chooseFrontTable2">
+<tr>
+<td>
+<p id="chooseFrontContent2" class="matchingCardContent"></p>
+</td>
+</tr>
+</table>
+</div>
+<div class="face back" id="chooseBack2" style="display: none;">
+<table id="chooseBackTable2" width="100%" height="100%" bgcolor="#ffffff" style="visibility: hidden;">
+<tr>
+<td>
+<p id="chooseBackContent2" class="matchingCardContent"></p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</td>
+
+<td>
+<div class="matching">
+<div id="chooseCard3" class="card">
+<div class="face front" id="chooseFront3">
+<table bgcolor="#ffffff" width="100%" height="100%" id="chooseFrontTable3">
+<tr>
+<td>
+<p id="chooseFrontContent3" class="matchingCardContent"></p>
+</td>
+</tr>
+</table>
+</div>
+<div class="face back" id="chooseBack3" style="display: none;">
+<table id="chooseBackTable3" width="100%" height="100%" bgcolor="#ffffff" style="visibility: hidden;">
+<tr>
+<td>
+<p id="chooseBackContent3" class="matchingCardContent"></p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</td>
+
+</tr>
+</table>
+</p>
+
 <canvas id="canvas" width=610" height="250"></canvas>
 <p id="mistake" class="general"></p>
 <p/>
@@ -331,6 +414,7 @@
 			<li><a id="alphabet">アルファベット抜け</a></li>
 			<li><a id="reading">読む練習</a></li>
 			<li><a id="matching">マッチング</a></li>
+			<li><a id="choose">単語選び</a></li>
 		</ul>
 		</td>
 		<td valign="top" bgcolor="#ffffff" style="padding: 2" width="60%">
@@ -411,6 +495,11 @@ function onNav(e) {
 			document.getElementById("readingOptions").style.display = "inline";
 			document.getElementById("matchingOptions").style.display = "none";
 		} else if (id === "matching") {
+			document.getElementById("keyboardOptions").style.display = "none";
+			document.getElementById("alphabetOptions").style.display = "none";
+			document.getElementById("readingOptions").style.display = "none";
+			document.getElementById("matchingOptions").style.display = "inline";
+		} else if (id === "choose") {
 			document.getElementById("keyboardOptions").style.display = "none";
 			document.getElementById("alphabetOptions").style.display = "none";
 			document.getElementById("readingOptions").style.display = "none";

@@ -22,6 +22,11 @@ const TYPE_READING = TYPE_ALPHABET + 1;
 const TYPE_MATCHING = TYPE_READING + 1;
 
 /**
+ * The user will select the correct definition given three choices.
+ */
+const TYPE_CHOOSE = TYPE_MATCHING + 1;
+
+/**
  * The type of flashcard run that has been selected.
  * 
  * @see TYPE_FLASHCARD
@@ -44,6 +49,13 @@ var english = null;
  * @see english
  */
 var japanese = null;
+
+/**
+ * The array of original English words on the flashcards.
+ * 
+ * @see english
+ */
+var originalEnglish = null;
 
 /**
  * The number of cards that are left in the deck.
@@ -148,6 +160,8 @@ function readSample() {
 				done[wordCounter] = false;
 				wordCounter++;
 			}
+			// clone the English words
+			originalEnglish = english.slice(0);
 			remaining = english.length;
 	
 			fileCounter++;
@@ -192,6 +206,8 @@ function readFiles() {
 			done[wordCounter] = false;
 			wordCounter++;
 		}
+		// clone the English words
+		originalEnglish = english.slice(0);
 		remaining = english.length;
 
 		fileCounter++;
@@ -218,7 +234,10 @@ function getText() {
 }
 
 function getAnswer() {
-	return document.getElementById("readingEnglish").checked ? japanese[idx] : english[idx];
+	if (type === TYPE_READING) {
+		return document.getElementById("readingEnglish").checked ? japanese[idx] : english[idx];
+	}
+	return english[idx];
 }
 
 function updateFlashCard() {
@@ -329,6 +348,16 @@ function showError() {
 	playErrorAudio();
 }
 
+function hideError() {
+	document.getElementById("mistake").innerHTML = "";
+}
+
+/**
+ * Returns true and moves on to the next flashcard if the given answer is correct.
+ * 
+ * @param answer the answer that the user has provided
+ * @return true if the given answer is correct, false otherwise
+ */
 function next(answer) {
 	// check if the answer matches, or if we're just doing a read through
 	if (answer === english[idx] || type === TYPE_READING) {
@@ -344,7 +373,8 @@ function next(answer) {
 		switch (type) {
 			case TYPE_FLASHCARD:
 			case TYPE_ALPHABET:
-				document.getElementById("mistake").innerHTML = "";
+			case TYPE_CHOOSE:
+				hideError();
 				break;
 			case TYPE_READING:
 				document.getElementById("readingDisplay").innerHTML = "";
@@ -364,9 +394,10 @@ function next(answer) {
 				card.className = "card";
 			}
 		}
-	} else {
-		showError();
+		return true;
 	}
+	showError();
+	return false;
 }
 
 function onClick() {
@@ -437,7 +468,7 @@ function fillInTheBlank(c) {
 			showError();
 		} else {
 			// clear the error message otherwise
-			document.getElementById("mistake").innerHTML = "";
+			hideError();
 		}
 	}
 }
@@ -494,6 +525,8 @@ function getType() {
 				return TYPE_READING;
 			} else if (id === "matching") {
 				return TYPE_MATCHING;
+			} else if (id === "choose") {
+				return TYPE_CHOOSE;
 			}
 			throw new Error("Unknown type: " + id);
 		}
@@ -506,6 +539,8 @@ function startCountdown() {
 	document.getElementById("restartBtn").disabled = false;
 
 	type = getType();
+	// reset all necessary values
+	reset();	
 	hasWarned = false;
 
 	var showKeyboard = document.getElementById("keyboardCheckbox").checked;
@@ -517,6 +552,7 @@ function startCountdown() {
 			document.getElementById("alphabetsContent").style.display = "none";
 			document.getElementById("readingContent").style.display = "none";
 			document.getElementById("matchingContent").style.display = "none";
+			document.getElementById("chooseContent").style.display = "none";
 			break;
 		case TYPE_ALPHABET:
 			remove = parseInt(document.getElementById("alphabetRemoval").value, 10);
@@ -526,6 +562,7 @@ function startCountdown() {
 			document.getElementById("alphabetsContent").style.display = "inline";
 			document.getElementById("readingContent").style.display = "none";
 			document.getElementById("matchingContent").style.display = "none";
+			document.getElementById("chooseContent").style.display = "none";
 			break;
 		case TYPE_READING:
 			document.getElementById("flashcardDiv").style.display = "block";
@@ -533,6 +570,7 @@ function startCountdown() {
 			document.getElementById("alphabetsContent").style.display = "none";
 			document.getElementById("readingContent").style.display = "inline";
 			document.getElementById("matchingContent").style.display = "none";
+			document.getElementById("chooseContent").style.display = "none";
 			showKeyboard = false;
 			break;
 		case TYPE_MATCHING:
@@ -541,8 +579,18 @@ function startCountdown() {
 			document.getElementById("alphabetsContent").style.display = "none";
 			document.getElementById("readingContent").style.display = "none";
 			document.getElementById("matchingContent").style.display = "inline";
+			document.getElementById("chooseContent").style.display = "none";
 			showKeyboard = false;
 			break;
+		case TYPE_CHOOSE:
+			document.getElementById("flashcardDiv").style.display = "block";
+			document.getElementById("flashcardContent").style.display = "none";
+			document.getElementById("alphabetsContent").style.display = "none";
+			document.getElementById("readingContent").style.display = "none";
+			document.getElementById("matchingContent").style.display = "none";
+			document.getElementById("chooseContent").style.display = "inline";
+			showKeyboard = false;
+			break; 
 	}
 
 	if (showKeyboard) {
@@ -556,6 +604,10 @@ function startCountdown() {
 		updateRemaining();
 	} else {
 		show();
+
+		if (type === TYPE_CHOOSE) {
+			makeSelections();
+		}
 	}
 	// hide the setup popup
 	document.getElementById("openModal").style.display = "none";
@@ -581,6 +633,59 @@ function startCountdown() {
 		document.getElementById("input").disabled = false;
 		document.getElementById("input").focus();
 		startTime = new Date().getTime();
+	}
+}
+
+/**
+ * Resets the state of the application in preparation of the next run.
+ */
+function reset() {
+	// remove the red glow around the input field
+	document.getElementById("input").className = "input";
+
+	hideError();
+
+	document.getElementById("chooseBackContent1").innerHTML = "";
+	document.getElementById("chooseBackContent2").innerHTML = "";
+	document.getElementById("chooseBackContent3").innerHTML = "";
+
+	document.getElementById("chooseFrontContent1").innerHTML = "";
+	document.getElementById("chooseFrontContent2").innerHTML = "";
+	document.getElementById("chooseFrontContent3").innerHTML = "";
+}
+
+function getOption(answer, option) {
+	var value = null;
+	while (true) {
+		var optIdx = Math.floor(Math.random() * originalEnglish.length);
+		if (option !== originalEnglish[optIdx] && answer !== originalEnglish[optIdx]) {
+			return originalEnglish[optIdx];
+		}
+	}
+}
+
+function makeSelections() {
+	var content1 = document.getElementById(back ? "chooseBackContent1" : "chooseFrontContent1");
+	var content2 = document.getElementById(back ? "chooseBackContent2" : "chooseFrontContent2");
+	var content3 = document.getElementById(back ? "chooseBackContent3" : "chooseFrontContent3");
+
+	var answer = getAnswer();
+	var optionA = getOption(answer, answer);
+	var optionB = getOption(answer, optionA);
+
+	var answerIdx = Math.ceil(Math.random() * 3);
+	if (answerIdx === 1) {
+		content1.innerHTML = answer;
+		content2.innerHTML = optionA;
+		content3.innerHTML = optionB;
+	} else if (answerIdx === 2) {
+		content1.innerHTML = optionA;
+		content2.innerHTML = answer;
+		content3.innerHTML = optionB;
+	} else {
+		content1.innerHTML = optionA;
+		content2.innerHTML = optionB;
+		content3.innerHTML = answer;
 	}
 }
 
@@ -754,7 +859,7 @@ function flip() {
 var frontTables = [];
 var backTables = [];
 
-function mouseDown(e) {
+function mouseDownMatching(e) {
 	var innerDiv = e.currentTarget.children[back ? 1 : 0];
 	var table = innerDiv.getElementsByTagName("table")[0];
 	if (table.className === "cleared") {
@@ -829,10 +934,57 @@ function matches(one, two) {
 	}
 }
 
+function mouseDownChoose(e) {
+	var innerDiv = e.currentTarget.children[back ? 1 : 0];
+	var table = innerDiv.getElementsByTagName("table")[0];
+	var selection = table.children[0].children[0].children[0].children[0].innerHTML;
+	if (next(selection)) {
+
+		back = !back;
+
+		makeSelections();
+
+		if (back) {
+			for (var v = 1; v < 4; v++) {
+				document.getElementById("chooseCard" + v).className = "card flipped";
+
+				document.getElementById("chooseFront" + v).style.display = "none";
+				document.getElementById("chooseBack" + v).style.display = "block";
+			
+				document.getElementById("chooseFrontTable" + v).style.visibility = "hidden";
+				document.getElementById("chooseBackTable" + v).style.visibility = "visible";
+				document.getElementById("chooseBackTable" + v).className = "";
+			}
+		} else {
+			for (var v = 1; v < 4; v++) {
+				document.getElementById("chooseCard" + v).className = "card";
+
+				document.getElementById("chooseFront" + v).style.display = "block";
+				document.getElementById("chooseBack" + v).style.display = "none";
+			
+				document.getElementById("chooseFrontTable" + v).style.visibility = "visible";
+				document.getElementById("chooseBackTable" + v).style.visibility = "hidden";
+				document.getElementById("chooseFrontTable" + v).className = "";
+			}
+		}
+	} else {
+		table.className = "wrong";
+		var f = function () {
+			if (table.className === "wrong") {
+				table.className = "default";
+			}
+		};
+		setTimeout(f, 500);
+	}
+}
+
 function addMouseListener() {
 	for (var tables = 1; tables < 13; tables++) {
-		document.getElementById("card" + tables).addEventListener("mousedown", mouseDown, false);
+		document.getElementById("card" + tables).addEventListener("mousedown", mouseDownMatching, false);
 	}	
+	document.getElementById("chooseCard1").addEventListener("mousedown", mouseDownChoose, false);
+	document.getElementById("chooseCard2").addEventListener("mousedown", mouseDownChoose, false);
+	document.getElementById("chooseCard3").addEventListener("mousedown", mouseDownChoose, false);
 }
 
 function showReport() {
