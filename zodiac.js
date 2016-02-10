@@ -640,6 +640,9 @@ function startCountdown() {
  * Resets the state of the application in preparation of the next run.
  */
 function reset() {
+	// remove the red glow around the input field
+	document.getElementById("input").className = "input";
+
 	hideError();
 
 	document.getElementById("chooseBackContent1").innerHTML = "";
