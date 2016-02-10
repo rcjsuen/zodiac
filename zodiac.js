@@ -348,6 +348,10 @@ function showError() {
 	playErrorAudio();
 }
 
+function hideError() {
+	document.getElementById("mistake").innerHTML = "";
+}
+
 /**
  * Returns true and moves on to the next flashcard if the given answer is correct.
  * 
@@ -370,7 +374,7 @@ function next(answer) {
 			case TYPE_FLASHCARD:
 			case TYPE_ALPHABET:
 			case TYPE_CHOOSE:
-				document.getElementById("mistake").innerHTML = "";
+				hideError();
 				break;
 			case TYPE_READING:
 				document.getElementById("readingDisplay").innerHTML = "";
@@ -464,7 +468,7 @@ function fillInTheBlank(c) {
 			showError();
 		} else {
 			// clear the error message otherwise
-			document.getElementById("mistake").innerHTML = "";
+			hideError();
 		}
 	}
 }
@@ -636,6 +640,8 @@ function startCountdown() {
  * Resets the state of the application in preparation of the next run.
  */
 function reset() {
+	hideError();
+
 	document.getElementById("chooseBackContent1").innerHTML = "";
 	document.getElementById("chooseBackContent2").innerHTML = "";
 	document.getElementById("chooseBackContent3").innerHTML = "";
