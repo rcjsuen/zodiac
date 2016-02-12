@@ -620,7 +620,7 @@ function startCountdown() {
 		// show the countdown timer
 		document.getElementById("countdown").style.display = "inline";
 		start = new Date().getTime();
-		drawCountdownCanvas();
+		drawCountdown();
 	} else {
 		timeLimit = -1;
 		remainingTime = -1;
@@ -640,6 +640,9 @@ function startCountdown() {
  * Resets the state of the application in preparation of the next run.
  */
 function reset() {
+	canvas = document.getElementById("countdownCanvas");
+	ctx = canvas.getContext("2d");
+
 	// remove the red glow around the input field
 	document.getElementById("input").className = "input";
 
@@ -1098,26 +1101,10 @@ var canvas = document.getElementById("countdownCanvas");
 var ctx = canvas.getContext("2d");
 var startPoint = 0 - (Math.PI / 2);
 
-function drawCountdownCanvas() {
-	var now = new Date().getTime();
-	if (now - start >= countdownTime * 1000) {
-		ctx.clearRect(0, 0, canvas.width, canvas.height);
-		ctx.shadowOffsetX = 0;
-		ctx.shadowOffsetY = 0;
-		
-		ctx.fillStyle = "black";
-		ctx.beginPath();
-		ctx.moveTo(250, 250);
-		ctx.arc(250, 250, 200, startPoint, Math.PI * 2);
-			ctx.fill();
-		ctx.closePath();
-		
-		ctx.fillStyle = "#eeeeee";
-		ctx.beginPath();
-		ctx.moveTo(250, 250);
-		ctx.arc(250, 250, 190, startPoint, Math.PI * 2);
-		ctx.fill();
-		
+function drawCountdown() {
+	if (drawCountdownCanvas(countdownTime, canvas.width / 2, 230, 215, 200, 190, "400px Calibri", 5)) {
+		requestAnimationFrame(drawCountdown);
+	} else {
 		// show the content
 		document.getElementById("body").style.background = "#eeeeee";
 		document.getElementById("content").style.display = "inline";
@@ -1127,15 +1114,37 @@ function drawCountdownCanvas() {
 		document.getElementById("input").disabled = false;
 		document.getElementById("input").focus();
 		startTime = new Date().getTime();
+		start = startTime;
 		
 		startTimeTrial();
 		document.getElementById("trialTimer").style.display = "inline";
-		drawTimerCanvas();
-		return;
+
+		canvas = document.getElementById("trialTimer");
+		ctx = canvas.getContext("2d");
+
+		drawTimer();
+	}
+}
+
+
+
+function drawTimer() {
+	if (drawCountdownCanvas(timeLimit, canvas.width / 2, 45, 40, 35, 30, "45px Calibri", 1)) {
+		requestAnimationFrame(drawTimer);
+	} else {
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+	}
+}
+
+function drawCountdownCanvas(limit, center, outer, inner, timerA, timerB, font, shadowOffset) {
+	var now = new Date().getTime();
+	if (now - start >= limit * 1000) {
+		return false;
 	}
 	
 	var pct = ((now - start) % 1000) / 1000;
-	var timeLeft = 5 - Math.floor((now - start) / 1000);
+	var outerPct = (now - start) / (limit * 1000);
+	var timeLeft = limit - Math.floor((now - start) / 1000);
 	
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	ctx.shadowOffsetX = 0;
@@ -1143,48 +1152,44 @@ function drawCountdownCanvas() {
 	
 	ctx.fillStyle = getTimerStyle(countdownTime, timeLeft);
 	ctx.beginPath();
-	ctx.moveTo(250, 250);
-	ctx.arc(250, 250, 230, startPoint, startPoint + (Math.PI * 2 * (.2 * (6 - timeLeft))));
+	ctx.moveTo(center, center);
+	ctx.arc(center, center, outer, startPoint, startPoint + (Math.PI * 2 * outerPct));
 	ctx.fill();
 	ctx.closePath();
 	
 	ctx.beginPath();
 	ctx.fillStyle = "#333333";
-	ctx.moveTo(250, 250);
-	ctx.arc(250, 250, 215, startPoint, Math.PI * 2);
+	ctx.moveTo(center, center);
+	ctx.arc(center, center, inner, startPoint, Math.PI * 2);
 	ctx.fill();
 	ctx.closePath();
 	
 	ctx.beginPath();
 	ctx.fillStyle = "white";
-	ctx.moveTo(250, 250);
-	ctx.arc(250, 250, 200, startPoint, startPoint + (Math.PI * 2 * (pct)));
+	ctx.moveTo(center, center);
+	ctx.arc(center, center, timerA, startPoint, startPoint + (Math.PI * 2 * (pct)));
 	ctx.fill();
 	ctx.closePath();
 	
 	ctx.fillStyle = getTimerStyle(countdownTime, timeLeft);
 	ctx.beginPath();
-	ctx.moveTo(250, 250);
-	ctx.arc(250, 250, 190, startPoint, startPoint + (Math.PI * 2 * (pct)));
+	ctx.moveTo(center, center);
+	ctx.arc(center, center, timerB, startPoint, startPoint + (Math.PI * 2 * (pct)));
 	ctx.fill();
 	ctx.closePath();
 	
 	ctx.beginPath();
-	ctx.font = "400px Calibri";
+	ctx.font = font;
 	ctx.fillStyle = "white";
 	ctx.shadowColor = "black";
-	ctx.shadowOffsetX = 5;
-	ctx.shadowOffsetY = 5;
+	ctx.shadowOffsetX = shadowOffset;
+	ctx.shadowOffsetY = shadowOffset;
 	ctx.textAlign = "center";
 	ctx.textBaseline = "middle";
-	ctx.fillText(timeLeft, 250, 250);
+	ctx.fillText(timeLeft, center, center);
 	ctx.closePath();
-	
-	requestAnimationFrame(drawCountdownCanvas);
+	return true;
 }
-
-var timerCanvas = document.getElementById("trialTimer");
-var timerCtx = timerCanvas.getContext("2d");
 
 function getTimerStyle(max, timeLeft) {
 	if (timeLeft <= max * 0.2) {
@@ -1193,62 +1198,4 @@ function getTimerStyle(max, timeLeft) {
 		return "#cccc00";
 	}
 	return "#33cc33";
-}
-
-function drawTimerCanvas() {
-	var x = timerCanvas.width / 2;
-	var y = timerCanvas.height / 2;
-	var now = new Date().getTime();
-	if (now - startTime >= timeLimit * 1000) {
-		timerCtx.clearRect(0, 0, timerCanvas.width, timerCanvas.height);
-		return;
-	}
-	
-	var pct = ((now - startTime) % 1000) / 1000;
-	var timeLeft = timeLimit - Math.floor((now - startTime) / 1000);
-	
-	timerCtx.clearRect(0, 0, timerCanvas.width, timerCanvas.height);
-	timerCtx.shadowOffsetX = 0;
-	timerCtx.shadowOffsetY = 0;
-	
-	timerCtx.fillStyle = getTimerStyle(timeLimit, timeLeft);
-	timerCtx.beginPath();
-	timerCtx.moveTo(x, y);
-	timerCtx.arc(x, y, 45, startPoint, startPoint + (Math.PI * 2 * (1 / timeLimit * (timeLimit - timeLeft))));
-	timerCtx.fill();
-	timerCtx.closePath();
-	
-	timerCtx.beginPath();
-	timerCtx.fillStyle = "#333333";
-	timerCtx.moveTo(x, y);
-	timerCtx.arc(x, y, 40, startPoint, Math.PI * 2);
-	timerCtx.fill();
-	timerCtx.closePath();
-	
-	timerCtx.beginPath();
-	timerCtx.fillStyle = "white";
-	timerCtx.moveTo(x, y);
-	timerCtx.arc(x, y, 35, startPoint, startPoint + (Math.PI * 2 * (pct)));
-	timerCtx.fill();
-	timerCtx.closePath();
-	
-	timerCtx.fillStyle = getTimerStyle(timeLimit, timeLeft);
-	timerCtx.beginPath();
-	timerCtx.moveTo(x, y);
-	timerCtx.arc(x, y, 30, startPoint, startPoint + (Math.PI * 2 * (pct)));
-	timerCtx.fill();
-	timerCtx.closePath();
-	
-	timerCtx.beginPath();
-	timerCtx.font = "45px Calibri";
-	timerCtx.fillStyle = "white";
-	timerCtx.shadowColor = "black";
-	timerCtx.shadowOffsetX = 1;
-	timerCtx.shadowOffsetY = 1;
-	timerCtx.textAlign = "center";
-	timerCtx.textBaseline = "middle";
-	timerCtx.fillText(timeLeft, x, y);
-	timerCtx.closePath();
-	
-	requestAnimationFrame(drawTimerCanvas);
 }
