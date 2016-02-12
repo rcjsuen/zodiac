@@ -1190,7 +1190,7 @@ function getTimerStyle(max, timeLeft) {
 	if (timeLeft <= max * 0.2) {
 		return "#cc0000";
 	} else if (timeLeft <= max * 0.6) {
-		return timerCtx.fillStyle = "#cccc00";
+		return "#cccc00";
 	}
 	return "#33cc33";
 }
