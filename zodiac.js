@@ -668,27 +668,24 @@ function getOption(answer, option) {
 }
 
 function makeSelections() {
-	var content1 = document.getElementById(back ? "chooseBackContent1" : "chooseFrontContent1");
-	var content2 = document.getElementById(back ? "chooseBackContent2" : "chooseFrontContent2");
-	var content3 = document.getElementById(back ? "chooseBackContent3" : "chooseFrontContent3");
+	var contents = [];
+	for (var i = 1; i < 4; i++) {
+		contents[i - 1] = document.getElementById(back ? "chooseBackContent" + i : "chooseFrontContent" + i);
+	}
 
+	var options = [];
 	var answer = getAnswer();
-	var optionA = getOption(answer, answer);
-	var optionB = getOption(answer, optionA);
+	options[0] = getOption(answer, answer);
+	options[1] = getOption(answer, options[0]);
 
-	var answerIdx = Math.ceil(Math.random() * 3);
-	if (answerIdx === 1) {
-		content1.innerHTML = answer;
-		content2.innerHTML = optionA;
-		content3.innerHTML = optionB;
-	} else if (answerIdx === 2) {
-		content1.innerHTML = optionA;
-		content2.innerHTML = answer;
-		content3.innerHTML = optionB;
-	} else {
-		content1.innerHTML = optionA;
-		content2.innerHTML = optionB;
-		content3.innerHTML = answer;
+	var answerIdx = Math.floor(Math.random() * 3);
+	var j = 0;
+	for (var i = 0; i < 3; i++) {
+		if (answerIdx === i) {
+			contents[i].innerHTML = answer;
+		} else {
+			contents[i].innerHTML = options[j++];
+		}
 	}
 }
 
