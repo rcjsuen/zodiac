@@ -58,6 +58,13 @@ var japanese = null;
 var originalEnglish = null;
 
 /**
+ * The array of original Japanese words on the flashcards.
+ * 
+ * @see japanese
+ */
+var originalJapanese = null;
+
+/**
  * The number of cards that are left in the deck.
  */
 var remaining = -1;
@@ -160,8 +167,9 @@ function readSample() {
 				done[wordCounter] = false;
 				wordCounter++;
 			}
-			// clone the English words
+			// clone the word list
 			originalEnglish = english.slice(0);
+			originalJapanese = japanese.slice(0);
 			remaining = english.length;
 	
 			fileCounter++;
@@ -206,8 +214,9 @@ function readFiles() {
 			done[wordCounter] = false;
 			wordCounter++;
 		}
-		// clone the English words
+		// clone the word list
 		originalEnglish = english.slice(0);
+		originalJapanese = japanese.slice(0);
 		remaining = english.length;
 
 		fileCounter++;
@@ -227,17 +236,23 @@ function readFiles() {
 document.getElementById('files').addEventListener('change', handleFileSelect, false);
 
 function getText() {
-	if (type === TYPE_READING && document.getElementById("readingEnglish").checked) {
-		return english[idx];
+	switch (type) {
+		case TYPE_READING:
+		case TYPE_CHOOSE:
+			return document.getElementById("cardEnglish").checked ? english[idx] : japanese[idx];
+		default:
+			return japanese[idx];
 	}
-	return japanese[idx];
 }
 
 function getAnswer() {
-	if (type === TYPE_READING) {
-		return document.getElementById("readingEnglish").checked ? japanese[idx] : english[idx];
+	switch (type) {
+		case TYPE_READING:
+		case TYPE_CHOOSE:
+			return document.getElementById("cardEnglish").checked ? japanese[idx] : english[idx];
+		default:
+			return english[idx];
 	}
-	return english[idx];
 }
 
 function updateFlashCard() {
@@ -353,6 +368,23 @@ function hideError() {
 }
 
 /**
+ * Returns true if the given answer is correct.
+ * 
+ * @param answer the answer that the user has provided
+ * @return true if the given answer is correct, false otherwise
+ */
+function check(answer) {
+	switch (type) {
+		case TYPE_READING:
+			return true;
+		case TYPE_CHOOSE:
+			return document.getElementById("cardEnglish").checked ? answer === japanese[idx] : answer === english[idx];
+		default:
+			return answer === english[idx];
+	}
+}
+
+/**
  * Returns true and moves on to the next flashcard if the given answer is correct.
  * 
  * @param answer the answer that the user has provided
@@ -360,7 +392,7 @@ function hideError() {
  */
 function next(answer) {
 	// check if the answer matches, or if we're just doing a read through
-	if (answer === english[idx] || type === TYPE_READING) {
+	if (check(answer)) {
 		remaining--;
 		
 		if (type !== TYPE_READING) {
@@ -658,11 +690,12 @@ function reset() {
 }
 
 function getOption(answer, option) {
+	var options = document.getElementById("cardEnglish").checked ? originalJapanese : originalEnglish;
 	var value = null;
 	while (true) {
-		var optIdx = Math.floor(Math.random() * originalEnglish.length);
-		if (option !== originalEnglish[optIdx] && answer !== originalEnglish[optIdx]) {
-			return originalEnglish[optIdx];
+		var optIdx = Math.floor(Math.random() * options.length);
+		if (option !== options[optIdx] && answer !== options[optIdx]) {
+			return options[optIdx];
 		}
 	}
 }
