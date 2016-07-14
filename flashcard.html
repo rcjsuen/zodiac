@@ -292,6 +292,9 @@
 <button class="input" type="button" onClick="onShow()">答えを示す</button>
 <p/>
 
+<p id="karutaContent" class="input" style="display: none;">
+<p/>
+
 <p id="matchingContent" class="input" style="display: none;">
 <p/>
 
@@ -415,6 +418,7 @@
 			<li><a id="reading">読む練習</a></li>
 			<li><a id="matching">マッチング</a></li>
 			<li><a id="choose">単語選び</a></li>
+			<li><a id="karuta">カルタ</a></li>
 		</ul>
 		</td>
 		<td valign="top" bgcolor="#ffffff" style="padding: 2" width="60%">
@@ -500,6 +504,11 @@ function onNav(e) {
 			document.getElementById("languageOptions").style.display = "none";
 			document.getElementById("matchingOptions").style.display = "inline";
 		} else if (id === "choose") {
+			document.getElementById("keyboardOptions").style.display = "none";
+			document.getElementById("alphabetOptions").style.display = "none";
+			document.getElementById("languageOptions").style.display = "inline";
+			document.getElementById("matchingOptions").style.display = "none";
+		} else if (id === "karuta") {
 			document.getElementById("keyboardOptions").style.display = "none";
 			document.getElementById("alphabetOptions").style.display = "none";
 			document.getElementById("languageOptions").style.display = "inline";

@@ -27,12 +27,19 @@ const TYPE_MATCHING = TYPE_READING + 1;
 const TYPE_CHOOSE = TYPE_MATCHING + 1;
 
 /**
+ * The user will select a card given its corresponding foreign definition.
+ */
+const TYPE_KARUTA = TYPE_CHOOSE + 1;
+
+/**
  * The type of flashcard run that has been selected.
  * 
  * @see TYPE_FLASHCARD
  * @see TYPE_ALPHABET
  * @see TYPE_READING
  * @see TYPE_MATCHING
+ * @see TYPE_CHOOSE
+ * @see TYPE_KARUTA
  */
 var type = -1;
 
@@ -250,6 +257,8 @@ function getAnswer() {
 		case TYPE_READING:
 		case TYPE_CHOOSE:
 			return document.getElementById("cardEnglish").checked ? japanese[idx] : english[idx];
+		case TYPE_KARUTA:
+			return document.getElementById("cardEnglish").checked ? english[idx] : japanese[idx];
 		default:
 			return english[idx];
 	}
@@ -559,6 +568,8 @@ function getType() {
 				return TYPE_MATCHING;
 			} else if (id === "choose") {
 				return TYPE_CHOOSE;
+			} else if (id === "karuta") {
+				return TYPE_KARUTA;
 			}
 			throw new Error("Unknown type: " + id);
 		}
@@ -585,6 +596,7 @@ function startCountdown() {
 			document.getElementById("readingContent").style.display = "none";
 			document.getElementById("matchingContent").style.display = "none";
 			document.getElementById("chooseContent").style.display = "none";
+			document.getElementById("karutaContent").style.display = "none";
 			break;
 		case TYPE_ALPHABET:
 			remove = parseInt(document.getElementById("alphabetRemoval").value, 10);
@@ -595,6 +607,7 @@ function startCountdown() {
 			document.getElementById("readingContent").style.display = "none";
 			document.getElementById("matchingContent").style.display = "none";
 			document.getElementById("chooseContent").style.display = "none";
+			document.getElementById("karutaContent").style.display = "none";
 			break;
 		case TYPE_READING:
 			document.getElementById("flashcardDiv").style.display = "block";
@@ -603,6 +616,7 @@ function startCountdown() {
 			document.getElementById("readingContent").style.display = "inline";
 			document.getElementById("matchingContent").style.display = "none";
 			document.getElementById("chooseContent").style.display = "none";
+			document.getElementById("karutaContent").style.display = "none";
 			showKeyboard = false;
 			break;
 		case TYPE_MATCHING:
@@ -612,6 +626,7 @@ function startCountdown() {
 			document.getElementById("readingContent").style.display = "none";
 			document.getElementById("matchingContent").style.display = "inline";
 			document.getElementById("chooseContent").style.display = "none";
+			document.getElementById("karutaContent").style.display = "none";
 			showKeyboard = false;
 			break;
 		case TYPE_CHOOSE:
@@ -621,8 +636,19 @@ function startCountdown() {
 			document.getElementById("readingContent").style.display = "none";
 			document.getElementById("matchingContent").style.display = "none";
 			document.getElementById("chooseContent").style.display = "inline";
+			document.getElementById("karutaContent").style.display = "none";
 			showKeyboard = false;
 			break; 
+		case TYPE_KARUTA:
+			document.getElementById("flashcardDiv").style.display = "none";
+			document.getElementById("flashcardContent").style.display = "none";
+			document.getElementById("alphabetsContent").style.display = "none";
+			document.getElementById("readingContent").style.display = "none";
+			document.getElementById("matchingContent").style.display = "inline";
+			document.getElementById("chooseContent").style.display = "none";
+			document.getElementById("karutaContent").style.display = "inline";
+			showKeyboard = false;
+			break;
 	}
 
 	if (showKeyboard) {
@@ -633,6 +659,9 @@ function startCountdown() {
 	
 	if (type === TYPE_MATCHING) {
 		fill();
+		updateRemaining();
+	} else if (type === TYPE_KARUTA) {
+		updateKaruta();
 		updateRemaining();
 	} else {
 		show();
@@ -732,6 +761,59 @@ function isDone(array) {
 	}
 	
 	return true;
+}
+
+function updateKaruta() {
+	resetMatchingCards();
+
+	var count = 0;
+	var max = remaining > 12 ? 12 : remaining;
+	var cards = [];
+	var selected = [];
+	var words = [];
+	for (var i = 0; i < max; i++) {
+		cards[i] = false;
+	}
+
+	for (var i = 0; i < remaining; i++) {
+		selected[i] = false;
+	}
+
+	var keyIdx = Math.floor(Math.random() * max);
+	var key = null;
+
+	while (!isDone(cards)) {
+		var c = Math.floor(Math.random() * remaining);
+		while (selected[c]) {
+			c = Math.floor(Math.random() * remaining);
+		}
+
+		cards[count] = true;
+		if (document.getElementById("cardEnglish").checked) {
+			if (keyIdx === count) {
+				key = japanese[c];
+				idx = c;
+			}
+			words[count++] = english[c];
+		} else {
+			if (keyIdx === count) {
+				key = english[c];
+				idx = c;
+			}
+			words[count++] = japanese[c];
+		}
+		selected[c] = true;
+	}
+
+	for (var i = 0; i < max; i++) {
+		var p = document.getElementById("frontContent" + (i + 1));
+		p.innerHTML = words[i];
+	}
+
+	if (max !== 12) {
+		hideOtherMatchingCards(max);
+	}
+	document.getElementById("karutaContent").innerHTML = key;
 }
 
 function getMaxFill(cards) {
@@ -892,9 +974,45 @@ function flip() {
 var frontTables = [];
 var backTables = [];
 
+function mouseDownKaruta(table) {
+	var selection = table.children[0].children[0].children[0].innerHTML;
+	var answer = getAnswer();
+
+	if (selection === getAnswer()) {
+		remaining--;
+		updateRemaining();
+		playBeepAudio();
+			
+		if (remaining === 0) {
+			showReport();
+			return;				
+		}
+
+		english[idx] = english[remaining];
+		japanese[idx] = japanese[remaining];
+		
+		updateKaruta();
+	} else {
+		playErrorAudio();
+			
+		table.className = "wrong";
+		var f = function () {
+			if (table.className === "wrong") {
+				table.className = "default";
+			}
+		};
+		setTimeout(f, 500);
+	}
+}
+
 function mouseDownMatching(e) {
 	var innerDiv = e.currentTarget.children[back ? 1 : 0];
 	var table = innerDiv.getElementsByTagName("table")[0];
+	if (type === TYPE_KARUTA) {
+		mouseDownKaruta(table);
+		return;
+	}
+
 	if (table.className === "cleared") {
 		return;
 	}
