@@ -223,16 +223,17 @@ function readFiles() {
 			done[wordCounter] = false;
 			wordCounter++;
 		}
-		// clone the word list
-		originalEnglish = english.slice(0);
-		originalJapanese = japanese.slice(0);
-		remaining = english.length;
 
 		fileCounter++;
 
 		if (fileCounter !== files.length) {
 			reader.readAsText(files[fileCounter], "UTF-8");
 		} else {
+			// clone the word list
+			originalEnglish = english.slice(0);
+			originalJapanese = japanese.slice(0);
+			remaining = english.length;
+
 			document.getElementById("report").style.display = "none";
 			document.getElementById("input").value = "";
 			startCountdown();
