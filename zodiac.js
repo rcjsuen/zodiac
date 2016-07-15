@@ -78,6 +78,11 @@ var remaining = -1;
 var idx = -1;
 
 var files = null;
+
+/**
+ * A counter for recording which file out of the files the user has
+ * selected is currently being processed.
+ */
 var fileCounter = 0;
 
 /**
@@ -162,7 +167,6 @@ function readSample() {
 	xhttp.onreadystatechange = function() {
 		if (xhttp.readyState === 4 && xhttp.status === 200) {
 			wordCounter = 0;
-			fileCounter = 0;
 			english = [];
 			japanese = [];
 			
@@ -179,8 +183,6 @@ function readSample() {
 			originalJapanese = japanese.slice(0);
 			remaining = english.length;
 	
-			fileCounter++;
-			
 			document.getElementById("report").style.display = "none";
 			document.getElementById("input").value = "";
 			startCountdown();
