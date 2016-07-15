@@ -1199,17 +1199,32 @@ function showReport() {
 	document.getElementById("report").style.display = "inline";
 }
 
+function startup() {
+	if (files === null) {
+		readSample();
+	} else {
+		readFiles();
+	}
+}
+
 function restart() {
 	document.getElementById("restartBtn").disabled = true;
 	
 	// redraw the keyboard as fast inputs may not get processed at the conclusion of a run
 	drawKeyboard();
 	
-	if (files === null) {
-		readSample();
-	} else {
-		readFiles();
+	english = originalEnglish.slice(0);
+	japanese = originalJapanese.slice(0);
+	remaining = english.length;
+	wordCounter = remaining;
+
+	for (var i = 0; i < done.length; i++) {
+		done[i] = false;
 	}
+
+	document.getElementById("report").style.display = "none";
+	document.getElementById("input").value = "";
+	startCountdown();
 }
 
 function setup() {
