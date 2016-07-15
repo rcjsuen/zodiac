@@ -661,6 +661,7 @@ function startCountdown() {
 		fill();
 		updateRemaining();
 	} else if (type === TYPE_KARUTA) {
+		resetMatchingCards();
 		updateKaruta();
 		updateRemaining();
 	} else {
@@ -763,9 +764,13 @@ function isDone(array) {
 	return true;
 }
 
+/**
+ * Updates the table of cards with an assortment of words from the word
+ * list and then returns the number of cards on the screen.
+ * 
+ * @return the number of cards that can be selected by the user
+ */
 function updateKaruta() {
-	resetMatchingCards();
-
 	var count = 0;
 	var max = remaining > 12 ? 12 : remaining;
 	var cards = [];
@@ -806,7 +811,8 @@ function updateKaruta() {
 	}
 
 	for (var i = 0; i < max; i++) {
-		var p = document.getElementById("frontContent" + (i + 1));
+		var contentId = back ? "backContent" + (i + 1) : "frontContent" + (i + 1);
+		var p = document.getElementById(contentId);
 		p.innerHTML = words[i];
 	}
 
@@ -814,6 +820,7 @@ function updateKaruta() {
 		hideOtherMatchingCards(max);
 	}
 	document.getElementById("karutaContent").innerHTML = key;
+	return max;
 }
 
 function getMaxFill(cards) {
@@ -941,6 +948,15 @@ function flip() {
 		count++;
 	}
 
+	flipCards(incomplete);
+}
+
+/**
+ * Flips the cards on the table.
+ * 
+ * @param incomplete the number of cards that are on the screen
+ */
+function flipCards(incomplete) {
 	for (var i = 1; i < 13; i++) {
 		var card = document.getElementById("card" + i);
 		if (card.className === "card") {
@@ -991,7 +1007,8 @@ function mouseDownKaruta(table) {
 		english[idx] = english[remaining];
 		japanese[idx] = japanese[remaining];
 		
-		updateKaruta();
+		back = !back;
+		flipCards(updateKaruta());
 	} else {
 		playErrorAudio();
 			
