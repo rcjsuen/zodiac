@@ -904,11 +904,6 @@ function hideOtherMatchingCards(offset) {
 var back = false;
 
 function flip() {
-	for (var i = 0; i < 12; i++) {
-		var content = back ? "backContent" + (i + 1) : "frontContent" + (i + 1);
-		var p = document.getElementById(content);
-		p.innerHTML = "";
-	}	
 	var count = 0;
 	var cards = [ false, false, false, false, false, false, false, false, false, false, false, false ];
 	var undone = 0;
