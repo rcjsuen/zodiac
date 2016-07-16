@@ -27,12 +27,19 @@ const TYPE_MATCHING = TYPE_READING + 1;
 const TYPE_CHOOSE = TYPE_MATCHING + 1;
 
 /**
+ * The user will select a card given its corresponding foreign definition.
+ */
+const TYPE_KARUTA = TYPE_CHOOSE + 1;
+
+/**
  * The type of flashcard run that has been selected.
  * 
  * @see TYPE_FLASHCARD
  * @see TYPE_ALPHABET
  * @see TYPE_READING
  * @see TYPE_MATCHING
+ * @see TYPE_CHOOSE
+ * @see TYPE_KARUTA
  */
 var type = -1;
 
@@ -58,12 +65,24 @@ var japanese = null;
 var originalEnglish = null;
 
 /**
+ * The array of original Japanese words on the flashcards.
+ * 
+ * @see japanese
+ */
+var originalJapanese = null;
+
+/**
  * The number of cards that are left in the deck.
  */
 var remaining = -1;
 var idx = -1;
 
 var files = null;
+
+/**
+ * A counter for recording which file out of the files the user has
+ * selected is currently being processed.
+ */
 var fileCounter = 0;
 
 /**
@@ -148,7 +167,6 @@ function readSample() {
 	xhttp.onreadystatechange = function() {
 		if (xhttp.readyState === 4 && xhttp.status === 200) {
 			wordCounter = 0;
-			fileCounter = 0;
 			english = [];
 			japanese = [];
 			
@@ -160,12 +178,11 @@ function readSample() {
 				done[wordCounter] = false;
 				wordCounter++;
 			}
-			// clone the English words
+			// clone the word list
 			originalEnglish = english.slice(0);
+			originalJapanese = japanese.slice(0);
 			remaining = english.length;
 	
-			fileCounter++;
-			
 			document.getElementById("report").style.display = "none";
 			document.getElementById("input").value = "";
 			startCountdown();
@@ -206,15 +223,17 @@ function readFiles() {
 			done[wordCounter] = false;
 			wordCounter++;
 		}
-		// clone the English words
-		originalEnglish = english.slice(0);
-		remaining = english.length;
 
 		fileCounter++;
 
 		if (fileCounter !== files.length) {
 			reader.readAsText(files[fileCounter], "UTF-8");
 		} else {
+			// clone the word list
+			originalEnglish = english.slice(0);
+			originalJapanese = japanese.slice(0);
+			remaining = english.length;
+
 			document.getElementById("report").style.display = "none";
 			document.getElementById("input").value = "";
 			startCountdown();
@@ -227,17 +246,25 @@ function readFiles() {
 document.getElementById('files').addEventListener('change', handleFileSelect, false);
 
 function getText() {
-	if (type === TYPE_READING && document.getElementById("readingEnglish").checked) {
-		return english[idx];
+	switch (type) {
+		case TYPE_READING:
+		case TYPE_CHOOSE:
+			return document.getElementById("cardEnglish").checked ? english[idx] : japanese[idx];
+		default:
+			return japanese[idx];
 	}
-	return japanese[idx];
 }
 
 function getAnswer() {
-	if (type === TYPE_READING) {
-		return document.getElementById("readingEnglish").checked ? japanese[idx] : english[idx];
+	switch (type) {
+		case TYPE_READING:
+		case TYPE_CHOOSE:
+			return document.getElementById("cardEnglish").checked ? japanese[idx] : english[idx];
+		case TYPE_KARUTA:
+			return document.getElementById("cardEnglish").checked ? english[idx] : japanese[idx];
+		default:
+			return english[idx];
 	}
-	return english[idx];
 }
 
 function updateFlashCard() {
@@ -353,6 +380,23 @@ function hideError() {
 }
 
 /**
+ * Returns true if the given answer is correct.
+ * 
+ * @param answer the answer that the user has provided
+ * @return true if the given answer is correct, false otherwise
+ */
+function check(answer) {
+	switch (type) {
+		case TYPE_READING:
+			return true;
+		case TYPE_CHOOSE:
+			return document.getElementById("cardEnglish").checked ? answer === japanese[idx] : answer === english[idx];
+		default:
+			return answer === english[idx];
+	}
+}
+
+/**
  * Returns true and moves on to the next flashcard if the given answer is correct.
  * 
  * @param answer the answer that the user has provided
@@ -360,7 +404,7 @@ function hideError() {
  */
 function next(answer) {
 	// check if the answer matches, or if we're just doing a read through
-	if (answer === english[idx] || type === TYPE_READING) {
+	if (check(answer)) {
 		remaining--;
 		
 		if (type !== TYPE_READING) {
@@ -527,6 +571,8 @@ function getType() {
 				return TYPE_MATCHING;
 			} else if (id === "choose") {
 				return TYPE_CHOOSE;
+			} else if (id === "karuta") {
+				return TYPE_KARUTA;
 			}
 			throw new Error("Unknown type: " + id);
 		}
@@ -553,6 +599,7 @@ function startCountdown() {
 			document.getElementById("readingContent").style.display = "none";
 			document.getElementById("matchingContent").style.display = "none";
 			document.getElementById("chooseContent").style.display = "none";
+			document.getElementById("karutaContent").style.display = "none";
 			break;
 		case TYPE_ALPHABET:
 			remove = parseInt(document.getElementById("alphabetRemoval").value, 10);
@@ -563,6 +610,7 @@ function startCountdown() {
 			document.getElementById("readingContent").style.display = "none";
 			document.getElementById("matchingContent").style.display = "none";
 			document.getElementById("chooseContent").style.display = "none";
+			document.getElementById("karutaContent").style.display = "none";
 			break;
 		case TYPE_READING:
 			document.getElementById("flashcardDiv").style.display = "block";
@@ -571,6 +619,7 @@ function startCountdown() {
 			document.getElementById("readingContent").style.display = "inline";
 			document.getElementById("matchingContent").style.display = "none";
 			document.getElementById("chooseContent").style.display = "none";
+			document.getElementById("karutaContent").style.display = "none";
 			showKeyboard = false;
 			break;
 		case TYPE_MATCHING:
@@ -580,6 +629,7 @@ function startCountdown() {
 			document.getElementById("readingContent").style.display = "none";
 			document.getElementById("matchingContent").style.display = "inline";
 			document.getElementById("chooseContent").style.display = "none";
+			document.getElementById("karutaContent").style.display = "none";
 			showKeyboard = false;
 			break;
 		case TYPE_CHOOSE:
@@ -589,8 +639,19 @@ function startCountdown() {
 			document.getElementById("readingContent").style.display = "none";
 			document.getElementById("matchingContent").style.display = "none";
 			document.getElementById("chooseContent").style.display = "inline";
+			document.getElementById("karutaContent").style.display = "none";
 			showKeyboard = false;
 			break; 
+		case TYPE_KARUTA:
+			document.getElementById("flashcardDiv").style.display = "none";
+			document.getElementById("flashcardContent").style.display = "none";
+			document.getElementById("alphabetsContent").style.display = "none";
+			document.getElementById("readingContent").style.display = "none";
+			document.getElementById("matchingContent").style.display = "inline";
+			document.getElementById("chooseContent").style.display = "none";
+			document.getElementById("karutaContent").style.display = "inline";
+			showKeyboard = false;
+			break;
 	}
 
 	if (showKeyboard) {
@@ -601,6 +662,10 @@ function startCountdown() {
 	
 	if (type === TYPE_MATCHING) {
 		fill();
+		updateRemaining();
+	} else if (type === TYPE_KARUTA) {
+		resetMatchingCards();
+		updateKaruta();
 		updateRemaining();
 	} else {
 		show();
@@ -620,7 +685,7 @@ function startCountdown() {
 		// show the countdown timer
 		document.getElementById("countdown").style.display = "inline";
 		start = new Date().getTime();
-		drawCountdownCanvas();
+		drawCountdown();
 	} else {
 		timeLimit = -1;
 		remainingTime = -1;
@@ -640,6 +705,9 @@ function startCountdown() {
  * Resets the state of the application in preparation of the next run.
  */
 function reset() {
+	canvas = document.getElementById("countdownCanvas");
+	ctx = canvas.getContext("2d");
+
 	// remove the red glow around the input field
 	document.getElementById("input").className = "input";
 
@@ -655,37 +723,35 @@ function reset() {
 }
 
 function getOption(answer, option) {
+	var options = document.getElementById("cardEnglish").checked ? originalJapanese : originalEnglish;
 	var value = null;
 	while (true) {
-		var optIdx = Math.floor(Math.random() * originalEnglish.length);
-		if (option !== originalEnglish[optIdx] && answer !== originalEnglish[optIdx]) {
-			return originalEnglish[optIdx];
+		var optIdx = Math.floor(Math.random() * options.length);
+		if (option !== options[optIdx] && answer !== options[optIdx]) {
+			return options[optIdx];
 		}
 	}
 }
 
 function makeSelections() {
-	var content1 = document.getElementById(back ? "chooseBackContent1" : "chooseFrontContent1");
-	var content2 = document.getElementById(back ? "chooseBackContent2" : "chooseFrontContent2");
-	var content3 = document.getElementById(back ? "chooseBackContent3" : "chooseFrontContent3");
+	var contents = [];
+	for (var i = 1; i < 4; i++) {
+		contents[i - 1] = document.getElementById(back ? "chooseBackContent" + i : "chooseFrontContent" + i);
+	}
 
+	var options = [];
 	var answer = getAnswer();
-	var optionA = getOption(answer, answer);
-	var optionB = getOption(answer, optionA);
+	options[0] = getOption(answer, answer);
+	options[1] = getOption(answer, options[0]);
 
-	var answerIdx = Math.ceil(Math.random() * 3);
-	if (answerIdx === 1) {
-		content1.innerHTML = answer;
-		content2.innerHTML = optionA;
-		content3.innerHTML = optionB;
-	} else if (answerIdx === 2) {
-		content1.innerHTML = optionA;
-		content2.innerHTML = answer;
-		content3.innerHTML = optionB;
-	} else {
-		content1.innerHTML = optionA;
-		content2.innerHTML = optionB;
-		content3.innerHTML = answer;
+	var answerIdx = Math.floor(Math.random() * 3);
+	var j = 0;
+	for (var i = 0; i < 3; i++) {
+		if (answerIdx === i) {
+			contents[i].innerHTML = answer;
+		} else {
+			contents[i].innerHTML = options[j++];
+		}
 	}
 }
 
@@ -699,6 +765,65 @@ function isDone(array) {
 	}
 	
 	return true;
+}
+
+/**
+ * Updates the table of cards with an assortment of words from the word
+ * list and then returns the number of cards on the screen.
+ * 
+ * @return the number of cards that can be selected by the user
+ */
+function updateKaruta() {
+	var count = 0;
+	var max = remaining > 12 ? 12 : remaining;
+	var cards = [];
+	var selected = [];
+	var words = [];
+	for (var i = 0; i < max; i++) {
+		cards[i] = false;
+	}
+
+	for (var i = 0; i < remaining; i++) {
+		selected[i] = false;
+	}
+
+	var keyIdx = Math.floor(Math.random() * max);
+	var key = null;
+
+	while (!isDone(cards)) {
+		var c = Math.floor(Math.random() * remaining);
+		while (selected[c]) {
+			c = Math.floor(Math.random() * remaining);
+		}
+
+		cards[count] = true;
+		if (document.getElementById("cardEnglish").checked) {
+			if (keyIdx === count) {
+				key = japanese[c];
+				idx = c;
+			}
+			words[count++] = english[c];
+		} else {
+			if (keyIdx === count) {
+				key = english[c];
+				idx = c;
+			}
+			words[count++] = japanese[c];
+		}
+		selected[c] = true;
+	}
+
+	for (var i = 0; i < max; i++) {
+		var contentId = back ? "backContent" + (i + 1) : "frontContent" + (i + 1);
+		var p = document.getElementById(contentId);
+		p.innerHTML = words[i];
+	}
+
+	if (max !== 12) {
+		hideOtherMatchingCards(max);
+	}
+	document.getElementById("karutaContent").innerHTML = key;
+	return max;
 }
 
 function getMaxFill(cards) {
@@ -782,11 +907,6 @@ function hideOtherMatchingCards(offset) {
 var back = false;
 
 function flip() {
-	for (var i = 0; i < 12; i++) {
-		var content = back ? "backContent" + (i + 1) : "frontContent" + (i + 1);
-		var p = document.getElementById(content);
-		p.innerHTML = "";
-	}	
 	var count = 0;
 	var cards = [ false, false, false, false, false, false, false, false, false, false, false, false ];
 	var undone = 0;
@@ -826,6 +946,15 @@ function flip() {
 		count++;
 	}
 
+	flipCards(incomplete);
+}
+
+/**
+ * Flips the cards on the table.
+ * 
+ * @param incomplete the number of cards that are on the screen
+ */
+function flipCards(incomplete) {
 	for (var i = 1; i < 13; i++) {
 		var card = document.getElementById("card" + i);
 		if (card.className === "card") {
@@ -859,9 +988,46 @@ function flip() {
 var frontTables = [];
 var backTables = [];
 
+function mouseDownKaruta(table) {
+	var selection = table.children[0].children[0].children[0].innerHTML;
+	var answer = getAnswer();
+
+	if (selection === getAnswer()) {
+		remaining--;
+		updateRemaining();
+		playBeepAudio();
+			
+		if (remaining === 0) {
+			showReport();
+			return;				
+		}
+
+		english[idx] = english[remaining];
+		japanese[idx] = japanese[remaining];
+		
+		back = !back;
+		flipCards(updateKaruta());
+	} else {
+		playErrorAudio();
+			
+		table.className = "wrong";
+		var f = function () {
+			if (table.className === "wrong") {
+				table.className = "default";
+			}
+		};
+		setTimeout(f, 500);
+	}
+}
+
 function mouseDownMatching(e) {
 	var innerDiv = e.currentTarget.children[back ? 1 : 0];
 	var table = innerDiv.getElementsByTagName("table")[0];
+	if (type === TYPE_KARUTA) {
+		mouseDownKaruta(table);
+		return;
+	}
+
 	if (table.className === "cleared") {
 		return;
 	}
@@ -1033,17 +1199,32 @@ function showReport() {
 	document.getElementById("report").style.display = "inline";
 }
 
+function startup() {
+	if (files === null) {
+		readSample();
+	} else {
+		readFiles();
+	}
+}
+
 function restart() {
 	document.getElementById("restartBtn").disabled = true;
 	
 	// redraw the keyboard as fast inputs may not get processed at the conclusion of a run
 	drawKeyboard();
 	
-	if (files === null) {
-		readSample();
-	} else {
-		readFiles();
+	english = originalEnglish.slice(0);
+	japanese = originalJapanese.slice(0);
+	remaining = english.length;
+	wordCounter = remaining;
+
+	for (var i = 0; i < done.length; i++) {
+		done[i] = false;
 	}
+
+	document.getElementById("report").style.display = "none";
+	document.getElementById("input").value = "";
+	startCountdown();
 }
 
 function setup() {
@@ -1098,26 +1279,10 @@ var canvas = document.getElementById("countdownCanvas");
 var ctx = canvas.getContext("2d");
 var startPoint = 0 - (Math.PI / 2);
 
-function drawCountdownCanvas() {
-	var now = new Date().getTime();
-	if (now - start >= countdownTime * 1000) {
-		ctx.clearRect(0, 0, canvas.width, canvas.height);
-		ctx.shadowOffsetX = 0;
-		ctx.shadowOffsetY = 0;
-		
-		ctx.fillStyle = "black";
-		ctx.beginPath();
-		ctx.moveTo(250, 250);
-		ctx.arc(250, 250, 200, startPoint, Math.PI * 2);
-			ctx.fill();
-		ctx.closePath();
-		
-		ctx.fillStyle = "#eeeeee";
-		ctx.beginPath();
-		ctx.moveTo(250, 250);
-		ctx.arc(250, 250, 190, startPoint, Math.PI * 2);
-		ctx.fill();
-		
+function drawCountdown() {
+	if (drawCountdownCanvas(countdownTime, canvas.width / 2, 230, 215, 200, 190, "400px Calibri", 5)) {
+		requestAnimationFrame(drawCountdown);
+	} else {
 		// show the content
 		document.getElementById("body").style.background = "#eeeeee";
 		document.getElementById("content").style.display = "inline";
@@ -1127,15 +1292,37 @@ function drawCountdownCanvas() {
 		document.getElementById("input").disabled = false;
 		document.getElementById("input").focus();
 		startTime = new Date().getTime();
+		start = startTime;
 		
 		startTimeTrial();
 		document.getElementById("trialTimer").style.display = "inline";
-		drawTimerCanvas();
-		return;
+
+		canvas = document.getElementById("trialTimer");
+		ctx = canvas.getContext("2d");
+
+		drawTimer();
+	}
+}
+
+
+
+function drawTimer() {
+	if (drawCountdownCanvas(timeLimit, canvas.width / 2, 45, 40, 35, 30, "45px Calibri", 1)) {
+		requestAnimationFrame(drawTimer);
+	} else {
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+	}
+}
+
+function drawCountdownCanvas(limit, center, outer, inner, timerA, timerB, font, shadowOffset) {
+	var now = new Date().getTime();
+	if (now - start >= limit * 1000) {
+		return false;
 	}
 	
 	var pct = ((now - start) % 1000) / 1000;
-	var timeLeft = 5 - Math.floor((now - start) / 1000);
+	var outerPct = (now - start) / (limit * 1000);
+	var timeLeft = limit - Math.floor((now - start) / 1000);
 	
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	ctx.shadowOffsetX = 0;
@@ -1143,112 +1330,50 @@ function drawCountdownCanvas() {
 	
 	ctx.fillStyle = getTimerStyle(countdownTime, timeLeft);
 	ctx.beginPath();
-	ctx.moveTo(250, 250);
-	ctx.arc(250, 250, 230, startPoint, startPoint + (Math.PI * 2 * (.2 * (6 - timeLeft))));
+	ctx.moveTo(center, center);
+	ctx.arc(center, center, outer, startPoint, startPoint + (Math.PI * 2 * outerPct));
 	ctx.fill();
 	ctx.closePath();
 	
 	ctx.beginPath();
 	ctx.fillStyle = "#333333";
-	ctx.moveTo(250, 250);
-	ctx.arc(250, 250, 215, startPoint, Math.PI * 2);
+	ctx.moveTo(center, center);
+	ctx.arc(center, center, inner, startPoint, Math.PI * 2);
 	ctx.fill();
 	ctx.closePath();
 	
 	ctx.beginPath();
 	ctx.fillStyle = "white";
-	ctx.moveTo(250, 250);
-	ctx.arc(250, 250, 200, startPoint, startPoint + (Math.PI * 2 * (pct)));
+	ctx.moveTo(center, center);
+	ctx.arc(center, center, timerA, startPoint, startPoint + (Math.PI * 2 * (pct)));
 	ctx.fill();
 	ctx.closePath();
 	
 	ctx.fillStyle = getTimerStyle(countdownTime, timeLeft);
 	ctx.beginPath();
-	ctx.moveTo(250, 250);
-	ctx.arc(250, 250, 190, startPoint, startPoint + (Math.PI * 2 * (pct)));
+	ctx.moveTo(center, center);
+	ctx.arc(center, center, timerB, startPoint, startPoint + (Math.PI * 2 * (pct)));
 	ctx.fill();
 	ctx.closePath();
 	
 	ctx.beginPath();
-	ctx.font = "400px Calibri";
+	ctx.font = font;
 	ctx.fillStyle = "white";
 	ctx.shadowColor = "black";
-	ctx.shadowOffsetX = 5;
-	ctx.shadowOffsetY = 5;
+	ctx.shadowOffsetX = shadowOffset;
+	ctx.shadowOffsetY = shadowOffset;
 	ctx.textAlign = "center";
 	ctx.textBaseline = "middle";
-	ctx.fillText(timeLeft, 250, 250);
+	ctx.fillText(timeLeft, center, center);
 	ctx.closePath();
-	
-	requestAnimationFrame(drawCountdownCanvas);
+	return true;
 }
-
-var timerCanvas = document.getElementById("trialTimer");
-var timerCtx = timerCanvas.getContext("2d");
 
 function getTimerStyle(max, timeLeft) {
 	if (timeLeft <= max * 0.2) {
 		return "#cc0000";
 	} else if (timeLeft <= max * 0.6) {
-		return timerCtx.fillStyle = "#cccc00";
+		return "#cccc00";
 	}
 	return "#33cc33";
-}
-
-function drawTimerCanvas() {
-	var x = timerCanvas.width / 2;
-	var y = timerCanvas.height / 2;
-	var now = new Date().getTime();
-	if (now - startTime >= timeLimit * 1000) {
-		timerCtx.clearRect(0, 0, timerCanvas.width, timerCanvas.height);
-		return;
-	}
-	
-	var pct = ((now - startTime) % 1000) / 1000;
-	var timeLeft = timeLimit - Math.floor((now - startTime) / 1000);
-	
-	timerCtx.clearRect(0, 0, timerCanvas.width, timerCanvas.height);
-	timerCtx.shadowOffsetX = 0;
-	timerCtx.shadowOffsetY = 0;
-	
-	timerCtx.fillStyle = getTimerStyle(timeLimit, timeLeft);
-	timerCtx.beginPath();
-	timerCtx.moveTo(x, y);
-	timerCtx.arc(x, y, 45, startPoint, startPoint + (Math.PI * 2 * (1 / timeLimit * (timeLimit - timeLeft))));
-	timerCtx.fill();
-	timerCtx.closePath();
-	
-	timerCtx.beginPath();
-	timerCtx.fillStyle = "#333333";
-	timerCtx.moveTo(x, y);
-	timerCtx.arc(x, y, 40, startPoint, Math.PI * 2);
-	timerCtx.fill();
-	timerCtx.closePath();
-	
-	timerCtx.beginPath();
-	timerCtx.fillStyle = "white";
-	timerCtx.moveTo(x, y);
-	timerCtx.arc(x, y, 35, startPoint, startPoint + (Math.PI * 2 * (pct)));
-	timerCtx.fill();
-	timerCtx.closePath();
-	
-	timerCtx.fillStyle = getTimerStyle(timeLimit, timeLeft);
-	timerCtx.beginPath();
-	timerCtx.moveTo(x, y);
-	timerCtx.arc(x, y, 30, startPoint, startPoint + (Math.PI * 2 * (pct)));
-	timerCtx.fill();
-	timerCtx.closePath();
-	
-	timerCtx.beginPath();
-	timerCtx.font = "45px Calibri";
-	timerCtx.fillStyle = "white";
-	timerCtx.shadowColor = "black";
-	timerCtx.shadowOffsetX = 1;
-	timerCtx.shadowOffsetY = 1;
-	timerCtx.textAlign = "center";
-	timerCtx.textBaseline = "middle";
-	timerCtx.fillText(timeLeft, x, y);
-	timerCtx.closePath();
-	
-	requestAnimationFrame(drawTimerCanvas);
 }

@@ -301,6 +301,9 @@
 <button class="input" type="button" onClick="onShow()">答えを示す</button>
 <p/>
 
+<p id="karutaContent" class="input" style="display: none;">
+<p/>
+
 <p id="matchingContent" class="input" style="display: none;">
 <p/>
 
@@ -424,20 +427,21 @@
 			<li><a id="reading">読む練習</a></li>
 			<li><a id="matching">マッチング</a></li>
 			<li><a id="choose">単語選び</a></li>
+			<li><a id="karuta">カルタ</a></li>
 		</ul>
 		</td>
 		<td valign="top" bgcolor="#ffffff" style="padding: 2" width="60%">
 		<p id="keyboardOptions"><input type="checkbox" id="keyboardCheckbox" state="true" checked="true">バーチャルキーボード</input></p>
 		<p id="alphabetOptions" style="display: none;"><input type="number" id="alphabetRemoval" min="1" value="1">抜け</input></p>
-		<p id="readingOptions" style="display: none;">カードの言語:<br/>
-		<input type="radio" id="readingEnglish" name="readingLanguage" checked="true">英語</input><br/>
-		<input type="radio" name="readingLanguage">日本語</input><br/>
+		<p id="languageOptions" style="display: none;">カードの言語:<br/>
+		<input type="radio" id="cardEnglish" name="cardLanguage" checked="true">英語</input><br/>
+		<input type="radio" name="cardLanguage">日本語</input><br/>
 		</p>
 		<p id="matchingOptions" style="display: none;">個別のセットアップがありません。</p>
 		</td>
 		</tr>
 		</table>
-		<p align="center"><button id="startBtn" type="button" onClick="restart()" disabled>スタート</button></p>
+		<p align="center"><button id="startBtn" type="button" onClick="startup()" disabled>スタート</button></p>
 	</div>
 </div>
 
@@ -491,28 +495,33 @@ function onNav(e) {
 		if (id === "flashcard") {
 			document.getElementById("keyboardOptions").style.display = "inline";
 			document.getElementById("alphabetOptions").style.display = "none";
-			document.getElementById("readingOptions").style.display = "none";
+			document.getElementById("languageOptions").style.display = "none";
 			document.getElementById("matchingOptions").style.display = "none";
 		} else if (id === "alphabet") {
 			document.getElementById("keyboardOptions").style.display = "inline";
 			document.getElementById("alphabetOptions").style.display = "block";
-			document.getElementById("readingOptions").style.display = "none";
+			document.getElementById("languageOptions").style.display = "none";
 			document.getElementById("matchingOptions").style.display = "none";
 		} else if (id === "reading") {
 			document.getElementById("keyboardOptions").style.display = "none";
 			document.getElementById("alphabetOptions").style.display = "none";
-			document.getElementById("readingOptions").style.display = "inline";
+			document.getElementById("languageOptions").style.display = "inline";
 			document.getElementById("matchingOptions").style.display = "none";
 		} else if (id === "matching") {
 			document.getElementById("keyboardOptions").style.display = "none";
 			document.getElementById("alphabetOptions").style.display = "none";
-			document.getElementById("readingOptions").style.display = "none";
+			document.getElementById("languageOptions").style.display = "none";
 			document.getElementById("matchingOptions").style.display = "inline";
 		} else if (id === "choose") {
 			document.getElementById("keyboardOptions").style.display = "none";
 			document.getElementById("alphabetOptions").style.display = "none";
-			document.getElementById("readingOptions").style.display = "none";
-			document.getElementById("matchingOptions").style.display = "inline";
+			document.getElementById("languageOptions").style.display = "inline";
+			document.getElementById("matchingOptions").style.display = "none";
+		} else if (id === "karuta") {
+			document.getElementById("keyboardOptions").style.display = "none";
+			document.getElementById("alphabetOptions").style.display = "none";
+			document.getElementById("languageOptions").style.display = "inline";
+			document.getElementById("matchingOptions").style.display = "none";
 		}
 	}
 }
