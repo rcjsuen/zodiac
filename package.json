@@ -1,0 +1,21 @@
+{
+  "name": "zodiac",
+  "version": "1.0.0",
+  "scripts": {
+    "server": "http-server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rcjsuen/zodiac.git"
+  },
+  "author": "Remy Suen",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/rcjsuen/zodiac/issues"
+  },
+  "homepage": "https://github.com/rcjsuen/zodiac#readme",
+  "description": "",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
