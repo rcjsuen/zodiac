@@ -171,7 +171,7 @@ function readSample() {
 			japanese = [];
 			
 			var text =  xhttp.responseText;
-			var strings = text.split("\r");
+			var strings = text.split("\n");
 			for (var i = 0; i < strings.length / 2; i++) {
 				english[wordCounter] = strings[i * 2].trim();
 				japanese[wordCounter] = strings[(i * 2) + 1].trim();
@@ -216,7 +216,7 @@ function readFiles() {
 	
 	reader.onload = function(e) {
 		var text = reader.result;
-		var strings = text.split("\r");
+		var strings = text.split("\n");
 		for (var i = 0; i < strings.length / 2; i++) {
 			english[wordCounter] = strings[i * 2].trim();
 			japanese[wordCounter] = strings[(i * 2) + 1].trim();
